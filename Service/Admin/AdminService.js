@@ -1,11 +1,14 @@
 // const { getAdmins, getUserByEmail, getAdmin, createAdminUser, updateAdminStatus } = require("../../DB/controller");
-const bcrypt=require("bcryptjs")
+const bcrypt=require("bcryptjs");
+const { UseDatabase, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus } = require("../../DB/controller");
 
 
 const AdminService = {  
     getAdminByGoverning: async (governing) => {
         try {
-          const users = await getAdmins(governing);
+          await UseDatabase();
+
+          const users = await getAdminsByGoverning(governing);
           return users;
         } catch (error) {
           console.error(error);
@@ -14,7 +17,9 @@ const AdminService = {
       },
       getAdminUser: async (userId) => {
         try {
-          const users = await getAdmin(userId);
+          await UseDatabase();
+
+          const users = await getAdminById(userId);
           return users;
         } catch (error) {
           console.error(error);
@@ -23,6 +28,8 @@ const AdminService = {
       },
       register: async (name,surname,email,password,phone,status,governing) => {
         try {
+          await UseDatabase();
+
           let salt = bcrypt.genSaltSync(8);
           password = bcrypt.hashSync(password, salt);
           await createAdminUser(name,surname,email,password,phone,status,governing);
@@ -34,6 +41,8 @@ const AdminService = {
       },
       login: async (email, password) => {
         try {
+          await UseDatabase();
+
           const user = await getUserByEmail(email);
           let passCheck = await bcrypt.compare(password, user.password);
           console.log(user);
@@ -51,6 +60,8 @@ const AdminService = {
       },
       statusOffline: async (id) => {
         try {
+          await UseDatabase();
+
           await updateAdminStatus(id, false);
           return true;
         } catch (error) {
@@ -60,6 +71,8 @@ const AdminService = {
       },
       statusOnline: async (id) => {
         try {
+          await UseDatabase();
+
           await updateAdminStatus(id, true);
 
           return true;

@@ -76,7 +76,7 @@ const createAdminUserTable = async (device_id, type) => {
     }
   };
   
-  const getAdmin = async (userId) => {
+  const getAdminById = async (userId) => {
     try {
       let query = `SELECT * FROM users`;
       let params = [];
@@ -93,7 +93,7 @@ const createAdminUserTable = async (device_id, type) => {
     }
   };
   
-  const getAdmins = async (governing) => {
+  const getAdminsByGoverning = async (governing) => {
     try {
       const query = `SELECT * FROM users WHERE governing = '${governing}'`;
       const [results] = await pool.query(query);
@@ -397,6 +397,7 @@ const createMessageTable = async () => {
 
 
   module.exports = {
+    createAdminUser,
     createTableRoom,
     createRoom,
     updateRoomStatus,
@@ -404,4 +405,8 @@ const createMessageTable = async () => {
     createMessage,
     getUser,
     UseDatabase,
+    getAdminsByGoverning,
+    getAdminById,
+    getUserByEmail,
+    updateAdminStatus
   };
