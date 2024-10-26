@@ -1,4 +1,4 @@
-const { createMessage } = require("../../DB/controller");
+// const { createMessage } = require("../../DB/controller");
 
 const MessageService = {
   send: async (room_id, writer_id, content, type) => {
@@ -7,6 +7,7 @@ const MessageService = {
       return { message: "Message sent successfully" };
     } catch (error) {
       console.error(error);
+      return false;
     }
   },
 };

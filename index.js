@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
 const MessageRouter = require("./Router/Message/MessageRouter");
+const { UseDatabase } = require("./DB/controller");
 // const connection=require("./DB/connection")
 // const pool=connection()
 const app = express();
@@ -17,6 +18,7 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
+UseDatabase();
 
 io.on("connection", (socket) => {
   console.log("connected", socket.id); // This should log when a socket connects

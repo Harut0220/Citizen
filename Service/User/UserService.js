@@ -1,4 +1,4 @@
-const {createUser, getUser, getAdmins } = require("../../DB/controller");
+// const {createUser, getUser, getAdmins } = require("../../DB/controller");
 
 
 const UserService = {

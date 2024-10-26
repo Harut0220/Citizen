@@ -1,4 +1,4 @@
-const { getAdmins, getUserByEmail, getAdmin, createAdminUser, updateUserStatus } = require("../../DB/controller");
+// const { getAdmins, getUserByEmail, getAdmin, createAdminUser, updateAdminStatus } = require("../../DB/controller");
 const bcrypt=require("bcryptjs")
 
 
@@ -51,7 +51,7 @@ const AdminService = {
       },
       statusOffline: async (id) => {
         try {
-          await updateUserStatus(id, false);
+          await updateAdminStatus(id, false);
           return true;
         } catch (error) {
           console.error(error);
@@ -60,7 +60,7 @@ const AdminService = {
       },
       statusOnline: async (id) => {
         try {
-          await updateUserStatus(id, true);
+          await updateAdminStatus(id, true);
 
           return true;
         } catch (error) {
