@@ -3,11 +3,8 @@ const MessageService = require("../../Service/Message/MessageService");
 const MessageController = {
   send: async (req, res) => {
     try {
-      // const { room_id, writer_id, content, type } = req.body;
-      const room_id = "afg";
-      const writer_id = "afg";
-      const content = "afg";
-      const type = "afg";
+      const { room_id, writer_id, content, type } = req.body;
+
       const result = await MessageService.send(
         room_id,
         writer_id,

@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
-const UserRouter = require("./Router/User/UserRouter");
+const Route = require("./Router/Router");
 const MessageRouter = require("./Router/Message/MessageRouter");
 // const connection=require("./DB/connection")
 // const pool=connection()
@@ -27,8 +27,8 @@ io.on("connection", (socket) => {
 
 
 
-app.use("/user", UserRouter);
-app.use("/message", MessageRouter);
+app.use("/api", Route);
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

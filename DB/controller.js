@@ -22,9 +22,41 @@ const createAdminUserTable = async (device_id, type) => {
   }
 };
 
+
+const getAdmins = async (governing) => {
+  try {
+    const query = `SELECT * FROM users WHERE governing = '${governing}'`;
+    const [results] = await pool.query(query);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const createMessageTable = async () => {
+  try {
+    const results = await pool.query(
+      `CREATE TABLE messages(
+        id INT AUTO_INCREMENT,
+        room_id varchar(200) NOT NULL,
+        writer_id varchar(2000) NOT NULL,
+        content varchar(200) NOT NULL,
+        type varchar(20) NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+);`
+    );
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+
 const getUser = async (userId) => {
   try {
-    let query = `SELECT * FROM users`;
+    let query = `SELECT * FROM mobile_users`;
     let params = [];
 
     if (userId) {
@@ -39,8 +71,32 @@ const getUser = async (userId) => {
   }
 };
 
+const getAdmin= async (userId) => {
+  try {
+    let query = `SELECT * FROM users`;
+    let params = [];
 
-const createAdminUser=async(name,surname,email,password,phone,status,governing)=>{
+    if (userId) {
+      query += ` WHERE id = ?`; // Add condition if userId is provided
+      params.push(userId);
+    }
+
+    const [results] = await pool.query(query, params);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const createAdminUser = async (
+  name,
+  surname,
+  email,
+  password,
+  phone,
+  status,
+  governing
+) => {
   try {
     const results = await pool.query(
       `INSERT INTO users(name,surname,email,password,phone,governing) VALUES('${name}', '${surname}', '${email}', '${password}', '${phone}',  '${governing}')`
@@ -49,8 +105,7 @@ const createAdminUser=async(name,surname,email,password,phone,status,governing)=
   } catch (error) {
     console.error(error);
   }
-}
-
+};
 
 const updateUserStatus = async (userId, newStatus) => {
   try {
@@ -64,18 +119,17 @@ const updateUserStatus = async (userId, newStatus) => {
   }
 };
 
-const getAdminUser = async (userId) => {
-  try {
-    const results = await pool.query(
-      `UPDATE users SET status = ? WHERE id = ?`,
-      [newStatus, userId]
-    );
-    return results;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
+// const getAdminUser = async (userId) => {
+//   try {
+//     const results = await pool.query(
+//       `UPDATE users SET status = ? WHERE id = ?`,
+//       [newStatus, userId]
+//     );
+//     return results;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const createUserTable = async (device_id, type) => {
   try {
@@ -97,10 +151,24 @@ const createUserTable = async (device_id, type) => {
     console.error(error);
   }
 };
-const createUser = async (user_device, name,email,message_category_id,governing_body_id,type) => {
+const createUser = async (
+  user_device,
+  name,
+  email,
+  message_category_id,
+  governing_body_id,
+  type
+) => {
   try {
-    console.log(user_device, name,email,message_category_id,governing_body_id,type);
-    
+    console.log(
+      user_device,
+      name,
+      email,
+      message_category_id,
+      governing_body_id,
+      type
+    );
+
     const results = await pool.query(
       `INSERT INTO mobile_users(user_device, name,email,message_category_id,governing_body_id,type) VALUES('${user_device}', '${name}','${email}', '${message_category_id}', '${governing_body_id}', '${type}')`
     );
@@ -157,5 +225,11 @@ module.exports = {
   createAdminUser,
   updateUserStatus,
   getUser,
-  getUserByEmail
+  getUserByEmail,
+  getAdmin,
+  createAdminUserTable,
+  createUserTable,
+  createMessageTable,
+  createTable,
+  getAdmins
 };

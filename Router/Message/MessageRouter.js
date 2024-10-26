@@ -3,6 +3,6 @@ const MessageController = require("../../Controller/Message/MessageController");
 
 const MessageRouter = Router();
 
-MessageRouter.post("/send", MessageController.send);
+MessageRouter.post("/create", MessageController.send);
 
 module.exports = MessageRouter;
