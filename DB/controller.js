@@ -1,5 +1,4 @@
-const pool = require("./Connection");
-
+const { pool } = require("./connection");
 
 
 
