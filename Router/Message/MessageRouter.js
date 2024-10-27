@@ -4,5 +4,6 @@ const MessageController = require("../../Controller/Message/MessageController");
 const MessageRouter = Router();
 
 MessageRouter.post("/create", MessageController.send);
+MessageRouter.get("/get/messages/:room_id", MessageController.getMessages);
 
 module.exports = MessageRouter;
