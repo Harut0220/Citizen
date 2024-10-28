@@ -128,7 +128,7 @@ const getAdminsByGoverning = async (governing) => {
 const updateAdminStatus = async (userId, newStatus) => {
   try {
     const results = await pool.query(
-      `UPDATE users SET status = ? WHERE id = ?`,
+      `UPDATE users SET online = ? WHERE id = ?`,
       [newStatus, userId]
     );
     return results;
