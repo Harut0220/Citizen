@@ -1,6 +1,20 @@
 const UserService = require("../../Service/User/UserService");
 
 const UserController = {
+  uptadeSocketId: async (req, res) => {
+    try {
+      const { id,socket_id } = req.body;
+      const result = await UserService.uptadeSocketId(id, socket_id);
+      if (result) {
+        res.status(200).send(result);
+      } else {
+        res.status(403).send("Error");
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error");
+    }
+  },
   getUser: async (req, res) => {
     try {
       const result = await UserService.getUser(req.params.id);
@@ -16,7 +30,7 @@ const UserController = {
   },
   UserRegister: async (req, res) => {
     try {
-      const {user_device,name,email,message_category_id,governing_body_id,type,} = req.body;
+      const {user_device,name,email,message_category_id,governing_body,socket_id,type} = req.body;
       console.log(
         user_device,);
       
@@ -25,7 +39,8 @@ const UserController = {
         name,
         email,
         message_category_id,
-        governing_body_id,
+        governing_body,
+        socket_id,
         type
       );
       if (result) {

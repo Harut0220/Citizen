@@ -38,12 +38,34 @@ const createAdminUserTable = async (device_id, type) => {
             email varchar(200) NOT NULL,
             password varchar(1000),
             phone varchar(200) NOT NULL,
+            socket_id varchar(200) DEFAULT NULL,
             status BOOLEAN DEFAULT TRUE,
             governing varchar(100),
+            online BOOLEAN DEFAULT FALSE,
             PRIMARY KEY (id)
     );`
     );
     return results;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateSocketIdAdmin = async (id, socket_id) => {
+  try {
+    // First, update the socket_id
+    await pool.query(
+      `UPDATE users SET socket_id = ? WHERE id = ?`,
+      [socket_id, id]
+    );
+
+    // Then, retrieve the updated data
+    const [updatedUser] = await pool.query(
+      `SELECT * FROM users WHERE id = ?`,
+      [id]
+    );
+
+    return updatedUser;
   } catch (error) {
     console.error(error);
   }
@@ -139,11 +161,33 @@ const createUserTable = async (device_id, type) => {
           message_category_id varchar(200) NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
           governing_body_id varchar(200),
+          socket_id varchar(200) NOT NULL,
           type varchar(200) NOT NULL,
           PRIMARY KEY (id)
   );`
     );
     return results;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+const updateSocketIdUser = async (id, socket_id) => {
+  try {
+    // First, update the socket_id
+    await pool.query(
+      `UPDATE mobile_users SET socket_id = ? WHERE id = ?`,
+      [socket_id, id]
+    );
+
+    // Then, retrieve the updated data
+    const [updatedUser] = await pool.query(
+      `SELECT * FROM mobile_users WHERE id = ?`,
+      [id]
+    );
+
+    return updatedUser;
   } catch (error) {
     console.error(error);
   }
@@ -155,6 +199,7 @@ const createUser = async (
   email,
   message_category_id,
   governing_body_id,
+  socket_id,
   type
 ) => {
   try {
@@ -164,12 +209,13 @@ const createUser = async (
       email,
       message_category_id,
       governing_body_id,
+      socket_id,
       type
     );
 
     const result = await pool.query(
-      `INSERT INTO mobile_users(user_device, name,email,message_category_id,governing_body_id,type) VALUES(?, ?, ?, ?, ?, ?)`,
-      [user_device, name, email, message_category_id, governing_body_id, type]
+      `INSERT INTO mobile_users(user_device, name,email,message_category_id,governing_body_id,socket_id,type) VALUES(?, ?, ?, ?, ?, ?, ?)`,
+      [user_device, name, email, message_category_id, governing_body_id,socket_id, type]
     );
     const newUserId = result[0].insertId;
 
@@ -248,7 +294,7 @@ const createTableRoom = async (room_id, writer_id, content, type) => {
           operator_id varchar(2000) NOT NULL,
           message_category_id varchar(200) NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
-          governing_body_id varchar(200),
+          governing_body varchar(200),
           PRIMARY KEY (id)
   );`
     );
@@ -397,5 +443,8 @@ module.exports = {
   getMessagesByRoomId,
   findRoomExist,
   getUserName,
-  getUserByNmaeAndId
+  getUserByNmaeAndId,
+  createUser,
+  updateSocketIdUser,
+  updateSocketIdAdmin
 };

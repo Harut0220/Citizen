@@ -1,9 +1,19 @@
 // const { getAdmins, getUserByEmail, getAdmin, createAdminUser, updateAdminStatus } = require("../../DB/controller");
 const bcrypt=require("bcryptjs");
-const { UseDatabase, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus } = require("../../DB/controller");
+const { UseDatabase, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus, updateSocketIdAdmin } = require("../../DB/controller");
 
 
-const AdminService = {  
+const AdminService = { 
+  uptadeSocketId: async (id, socketId) => {
+    try {
+      await UseDatabase();
+      const result = await updateSocketIdAdmin(id, socketId);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  } ,
     getAdminByGoverning: async (governing) => {
         try {
           await UseDatabase();

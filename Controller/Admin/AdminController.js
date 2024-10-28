@@ -4,6 +4,20 @@ const UserService = require("../../Service/User/UserService");
 
 
 const AdminController = {
+  uptadeSocketId: async (req, res) => {
+    try {
+      const { id, socket_id } = req.body;
+      const result = await AdminService.uptadeSocketId(id, socket_id);
+      if (result) {
+        res.status(200).send(result);
+      } else {
+        res.status(403).send("Error");
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error");
+    }
+  },
       getAdminByGoverning: async (req, res) => {
         try {
           const {governing} = req.query
