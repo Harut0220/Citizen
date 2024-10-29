@@ -3,7 +3,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
-const { UseDatabase } = require("./DB/controller");
+const { UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom } = require("./DB/controller");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -21,6 +21,7 @@ io.on("connection", (socket) => {
   console.log("connected", socket.id); // This should log when a socket connects
 
   socket.emit("me", socket.id)
+
   // Handle other socket events...
 });
 

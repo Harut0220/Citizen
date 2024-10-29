@@ -51,6 +51,16 @@ const createAdminUserTable = async (device_id, type) => {
   }
 };
 
+const getActivByGoverningOperator = async (governing) => {
+  try {
+    const query = `SELECT * FROM users WHERE governing = '${governing}' AND status = 1;`;
+    const [results] = await pool.query(query);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 const updateSocketIdAdmin = async (id, socket_id) => {
   try {
     // First, update the socket_id
@@ -304,6 +314,21 @@ const createTableRoom = async (room_id, writer_id, content, type) => {
   }
 };
 
+
+const getRoomByOperatorId = async (operatorId) => {
+  try {
+    const query = `
+        SELECT * 
+        FROM room 
+        WHERE operator_id = ?;`;
+    const [rows] = await pool.query(query, [operatorId]);
+    return rows;
+  } catch (error) {
+    console.error('Error retrieving messages:', error);
+    throw error;
+  }
+}
+
 const createRoom = async (
   mobile_user_id,
   mobile_user_name,
@@ -446,5 +471,7 @@ module.exports = {
   getUserByNmaeAndId,
   createUser,
   updateSocketIdUser,
-  updateSocketIdAdmin
+  updateSocketIdAdmin,
+  getActivByGoverningOperator,
+  getRoomByOperatorId
 };
