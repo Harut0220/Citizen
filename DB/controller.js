@@ -320,7 +320,7 @@ const getRoomByOperatorId = async (operatorId) => {
     const query = `
         SELECT * 
         FROM room 
-        WHERE operator_id = ?;`;
+        WHERE operator_id = ? AND activ = 1;`;
     const [rows] = await pool.query(query, [operatorId]);
     return rows;
   } catch (error) {
@@ -334,18 +334,18 @@ const createRoom = async (
   mobile_user_name,
   operator_id,
   message_category_id,
-  governing_body_id
+  governing_body
 ) => {
   try {
     // Insert a new room
     const result = await pool.query(
-      `INSERT INTO room (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body_id) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO room (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body) VALUES (?, ?, ?, ?, ?)`,
       [
         mobile_user_id,
         mobile_user_name,
         operator_id,
         message_category_id,
-        governing_body_id,
+        governing_body,
       ]
     );
 
@@ -373,7 +373,7 @@ const findRoomExist = async(mobile_user_id, mobile_user_name,operator_id,message
           AND mobile_user_name = ?
           AND operator_id = ?
           AND message_category_id = ?
-          AND governing_body_id = ?;`;
+          AND governing_body = ?;`;
     const [rows] = await pool.query(query, [mobile_user_id, mobile_user_name,operator_id,message_category_id,governing_body_id]);
     return rows;
 } catch (error) {
