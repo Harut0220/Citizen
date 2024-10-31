@@ -11,6 +11,8 @@ const RoomService = {
             const rooms=await getRoomByOperatorIdChat(operatorId);
             console.log(rooms,"room");
             for (let i = 0; i < rooms.length; i++) {
+                const userName=await getUser(rooms[i].mobile_user_id);
+                rooms[i].email=userName[0].email
                 const messages=await getMessagesByRoomId(rooms[i].id);
                 rooms[i].messages=messages
             }
