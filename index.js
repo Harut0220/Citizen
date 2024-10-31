@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
   socket.emit("me", socket.id)
 
   socket.on("operatorJoin",(data)=>{
-    socket.join(data.room)
+    socket.join(data.id)
   })
 
   socket.on("searchAdmin", async(data)=>{
@@ -52,8 +52,9 @@ io.on("connection", (socket) => {
       socket.join(room.id)
       console.log("operator_socket------",rooms[0].operator.socket_id);
       console.log("user_socket-------",data.socket_id);
+      room.email=data.email
       // socket.to(room.id).emit("roomCreated",{room:room.id})
-      socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",{room:room.id,user:data})
+      socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",room)
     }
 
   })
@@ -61,12 +62,12 @@ io.on("connection", (socket) => {
 
   socket.on("create_message",(data)=>{
     console.log("message-----",data);
-    io.to(data.roomID).emit("receive_message",data)
+    io.to(data.room_id).emit("receive_message",data)
   })
 
   socket.on("joinUser",(data)=>{
     console.log("joinUser------",data);
-    io.to(data.room).emit("roomCreated",{room:data.room})
+    io.to(data.id).emit("roomCreated",{room:data.id})
   })
 
   socket.on("markMessageAsRead", (data) => {
