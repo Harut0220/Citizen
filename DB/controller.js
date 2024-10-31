@@ -137,11 +137,19 @@ const getAdminsByGoverning = async (governing) => {
 
 const updateAdminStatus = async (userId, newStatus) => {
   try {
-    const results = await pool.query(
+    // Update the user's online status
+    await pool.query(
       `UPDATE users SET online = ? WHERE id = ?`,
       [newStatus, userId]
     );
-    return results;
+
+    // Retrieve and return the updated user data
+    const [updatedUser] = await pool.query(
+      `SELECT * FROM users WHERE id = ?`,
+      [userId]
+    );
+
+    return updatedUser[0]; // Return the updated user record
   } catch (error) {
     console.error(error);
   }

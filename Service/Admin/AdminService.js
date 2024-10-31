@@ -83,9 +83,9 @@ const AdminService = {
         try {
           await UseDatabase();
 
-          await updateAdminStatus(id, true);
+          const result=await updateAdminStatus(id, true);
 
-          return true;
+          return result;
         } catch (error) {
           console.error(error);
           return false;
