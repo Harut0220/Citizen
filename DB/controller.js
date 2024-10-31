@@ -307,9 +307,9 @@ const createTableRoom = async (room_id, writer_id, content, type) => {
     const results = await pool.query(
       `CREATE TABLE room(
           id INT AUTO_INCREMENT,
-          mobile_user_id varchar(200) NOT NULL,
+          mobile_user_id INT NOT NULL,
           mobile_user_name varchar(200) NOT NULL,
-          operator_id varchar(2000) NOT NULL,
+          operator_id INT NOT NULL,
           message_category_id varchar(200) NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
           governing_body varchar(200),
@@ -434,8 +434,8 @@ const createMessageTable = async () => {
     const results = await pool.query(
       `CREATE TABLE messages(
           id INT AUTO_INCREMENT,
-          room_id varchar(200) NOT NULL,
-          writer_id varchar(2000) NOT NULL,
+          room_id INT NOT NULL,
+          writer_id INT NOT NULL,
           content varchar(200) NOT NULL,
           writer varchar(20) NOT NULL,
           readed BOOLEAN DEFAULT FALSE,
