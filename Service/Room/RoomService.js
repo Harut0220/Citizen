@@ -1,10 +1,25 @@
 // const { updateRoomStatus,createRoom } = require("../../DB/controller");
 
-const { UseDatabase, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId } = require("../../DB/controller");
+const { UseDatabase, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId } = require("../../DB/controller");
 
 
 
 const RoomService = {
+    getRoom: async (operatorId) => {
+        try {
+            await UseDatabase();
+            const rooms=await getRoomByOperatorIdChat(operatorId);
+            console.log(rooms,"room");
+            for (let i = 0; i < rooms.length; i++) {
+                const messages=await getMessagesByRoomId(rooms[i].id);
+                rooms[i].messages=messages
+            }
+            return rooms
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
     deactiveRoom: async (id) => {
         try {
             await UseDatabase();

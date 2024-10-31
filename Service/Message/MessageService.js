@@ -1,8 +1,21 @@
 // const { createMessage } = require("../../DB/controller");
+const moment = require('moment');
 
-const { UseDatabase, createMessage,getMessagesByRoomId } = require("../../DB/controller");
+const { UseDatabase, createMessage,getMessagesByRoomId,updateMessageSituation } = require("../../DB/controller");
 
 const MessageService = {
+  messageSituation: async (message_id) => {
+    try {
+      await UseDatabase();
+      const results = await updateMessageSituation(message_id);
+      console.log(results,"results");
+      
+      return results;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  },
   getMessages: async (room_id) => {
     try {
       await UseDatabase();
@@ -13,12 +26,12 @@ const MessageService = {
       return false;
     } 
   },
-  send: async (room_id, writer_id, content, type) => {
+  send: async (room_id, writer_id, content, writer) => {
     try {
       await UseDatabase();
-
-      const results = await createMessage(room_id, writer_id, content, type);
-      return { message: "Message sent successfully" };
+      const created_at = moment().format("YYYY-MM-DD HH:mm");
+      const results = await createMessage(room_id, writer_id, content, writer,created_at);
+      return { message: "Message sent successfully",message:results };
     } catch (error) {
       console.error(error);
       return false;

@@ -314,6 +314,20 @@ const createTableRoom = async (room_id, writer_id, content, type) => {
   }
 };
 
+const getRoomByOperatorIdChat=async(operatorId)=>{
+  try {
+    const query = `
+        SELECT * 
+        FROM room 
+        WHERE operator_id = ?;`;
+    const [rows] = await pool.query(query, [operatorId]);
+    return rows;
+} catch (error) {
+    console.error('Error retrieving messages:', error);
+    throw error;
+  }
+}
+
 
 const getRoomByOperatorId = async (operatorId) => {
   try {
@@ -385,13 +399,23 @@ const findRoomExist = async(mobile_user_id, mobile_user_name,operator_id,message
 
 const updateRoomStatus = async (roomId, newStatus) => {
   try {
-    const results = await pool.query(`UPDATE room SET activ = ? WHERE id = ?`, [
+    // const newStatus = true;
+
+    // Update the message status
+    await pool.query(`UPDATE room SET activ = ? WHERE id = ?`, [
       newStatus,
       roomId,
     ]);
-    return results;
+
+    // Retrieve the updated message
+    const [results] = await pool.query(`SELECT * FROM room WHERE id = ?`, [
+      roomId,
+    ]);
+
+    return results[0]; // Return the first (and only) result
   } catch (error) {
     console.error(error);
+    throw error; // Optionally rethrow error for handling by the caller
   }
 };
 
@@ -405,8 +429,9 @@ const createMessageTable = async () => {
           room_id varchar(200) NOT NULL,
           writer_id varchar(2000) NOT NULL,
           content varchar(200) NOT NULL,
-          type varchar(20) NOT NULL,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          writer varchar(20) NOT NULL,
+          readed BOOLEAN DEFAULT FALSE,
+          created_at varchar(200) NOT NULL,
           PRIMARY KEY (id)
   );`
     );
@@ -416,11 +441,11 @@ const createMessageTable = async () => {
   }
 };
 
-const createMessage = async (room_id, writer_id, content, type) => {
+const createMessage = async (room_id, writer_id, content, writer,created_at) => {
   try {
     const result = await pool.query(
-      `INSERT INTO messages(room_id, writer_id, content, type) VALUES(?, ?, ?, ?)`,
-      [room_id, writer_id, content, type]
+      `INSERT INTO messages(room_id, writer_id, content, writer,created_at) VALUES(?, ?, ?, ?, ?)`,
+      [room_id, writer_id, content, writer,created_at]
     );
     const newMessageId = result[0].insertId;
 
@@ -434,6 +459,31 @@ const createMessage = async (room_id, writer_id, content, type) => {
     console.error(error);
   }
 };
+
+const updateMessageSituation = async (message_id) => {
+  try {
+    const newStatus = true;
+    console.log("message_id",message_id);
+    
+    // Update the message status
+    await pool.query(`UPDATE messages SET readed = ? WHERE id = ?`, [
+      newStatus,
+      message_id,
+    ]);
+
+    // Retrieve the updated message
+    const [results] = await pool.query(`SELECT * FROM messages WHERE id = ?`, [
+      message_id,
+    ]);
+    console.log(results[0],"results[0]");
+    
+    return results[0]; // Return the first (and only) result
+  } catch (error) {
+    console.error(error);
+    throw error; // Optionally rethrow error for handling by the caller
+  }
+};
+
 
 const getMessagesByRoomId = async (roomId) => {
   try {
@@ -473,5 +523,7 @@ module.exports = {
   updateSocketIdUser,
   updateSocketIdAdmin,
   getActivByGoverningOperator,
-  getRoomByOperatorId
+  getRoomByOperatorId,
+  getRoomByOperatorIdChat,
+  updateMessageSituation
 };

@@ -3,6 +3,20 @@ const RoomService = require("../../Service/Room/RoomService");
 
 
 const RoomController = {
+    getRoom: async (req, res) => {
+        try {
+            const {id} = req.params;
+            const result = await RoomService.getRoom(id);
+            if (result) {
+                res.status(200).send(result);
+            } else {
+                res.status(403).send("Error");
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error");
+        }
+    },
     deactiveRoom: async (req, res) => {
         try {
             const { id } = req.body;
