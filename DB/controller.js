@@ -491,9 +491,12 @@ const getMessagesByRoomId = async (roomId) => {
     let params = [];
 
     if (roomId) {
-      query += ` WHERE room_id = ?`; // Add condition if userId is provided
+      query += ` WHERE room_id = ?`; // Filter by roomId if provided
       params.push(roomId);
     }
+
+    // Add ORDER BY clause to sort by 'created_at' in ascending order
+    query += ` ORDER BY created_at ASC`;
 
     const [results] = await pool.query(query, params);
     return results;
