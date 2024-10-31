@@ -8,7 +8,7 @@ const AdminService = {
     try {
       await UseDatabase();
       const result = await updateSocketIdAdmin(id, socketId);
-      return result;
+      return result[0];
     } catch (error) {
       console.error(error);
       return false;
