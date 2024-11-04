@@ -313,6 +313,7 @@ const createTableRoom = async (room_id, writer_id, content, type) => {
           message_category_id varchar(200) NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
           governing_body varchar(200),
+          email varchar(200) NOT NULL,
           PRIMARY KEY (id)
   );`
     );
@@ -356,18 +357,20 @@ const createRoom = async (
   mobile_user_name,
   operator_id,
   message_category_id,
-  governing_body
+  governing_body,
+  email
 ) => {
   try {
     // Insert a new room
     const result = await pool.query(
-      `INSERT INTO room (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO room (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body,email) VALUES (?, ?, ?, ?, ?, ?)`,
       [
         mobile_user_id,
         mobile_user_name,
         operator_id,
         message_category_id,
         governing_body,
+        email
       ]
     );
 

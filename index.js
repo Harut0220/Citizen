@@ -46,13 +46,13 @@ io.on("connection", (socket) => {
       // socket.to(data.socket_id).emit("join", existRoom[0].id)
       console.log("exist-----",existRoom);
     }else{
-      const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id)
+      const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
       console.log("room",room);
       currentRoom = room.id
       socket.join(room.id)
       console.log("operator_socket------",rooms[0].operator.socket_id);
       console.log("user_socket-------",data.socket_id);
-      room.email=data.email
+      room.messages=[]
       // socket.to(room.id).emit("roomCreated",{room:room.id})
       socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",room)
     }
