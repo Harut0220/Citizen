@@ -3,10 +3,12 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
-const { UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
+const {getMessagesByRoomId, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
+  pingInterval: 25000, 
+  pingTimeout: 10000,
   cors: {
     origin: ["http://localhost:3000","http://localhost:3001"], // Ensure this matches your frontend
     methods: ["GET", "POST"],
@@ -22,6 +24,13 @@ io.on("connection", (socket) => {
   let currentRoom = null
 
   socket.emit("me", socket.id)
+
+  socket.on("disconnect", (data)=>{
+    console.log("socket-disconnect ----",socket.id)
+  })
+  io.on("disconnect", (data)=>{
+    console.log("io--socket-disconnect ----",socket.id)
+  })
 
   socket.on("operatorJoin",(data)=>{
     socket.join(data.id)
@@ -44,7 +53,19 @@ io.on("connection", (socket) => {
 
     if(existRoom.length){
       // socket.to(data.socket_id).emit("join", existRoom[0].id)
-      console.log("exist-----",existRoom);
+      console.log("room",existRoom);
+      currentRoom = existRoom.id
+      socket.join(existRoom.id)
+      // console.log("operator_socket------",rooms[0].operator.socket_id);
+      // console.log("user_socket-------",data.socket_id);
+      
+          const userName=await getUser(existRoom.mobile_user_id);
+          existRoom.email=userName[0].email
+          console.log("findedUser-----",userName);
+          const messages=await getMessagesByRoomId(existRoom.id);
+          existRoom.messages=messages
+      // socket.to(room.id).emit("roomCreated",{room:room.id})
+      // socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",existRoom)
     }else{
       const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
       console.log("room",room);
@@ -71,9 +92,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("markMessageAsRead", (data) => {
-    console.log("marking message as read", data);
-    // Emit to all users in the room to update read status
-    io.to(data.roomID).emit("messageRead", { roomID: data.roomID });
+    io.to(data.id).emit("messageRead", data);
   });
 
 
