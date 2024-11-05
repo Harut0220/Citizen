@@ -3,7 +3,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
-const {getMessagesByRoomId, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
+const {getMessagesByRoomId,getAdminById, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -50,32 +50,37 @@ io.on("connection", (socket) => {
     }
     rooms.sort((a,b)=>a.activRooms.length-b.activRooms.length)
     const existRoom=await findRoomExist(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id)
+    console.log("isexistto-----",existRoom);
+    console.log("type-exist-array",Array.isArray(existRoom))
+    if(!Array.isArray(existRoom)){
 
-    if(existRoom.length){
-      // socket.to(data.socket_id).emit("join", existRoom[0].id)
-      console.log("room",existRoom);
+      console.log("room-exist",existRoom);
       currentRoom = existRoom.id
       socket.join(existRoom.id)
-      // console.log("operator_socket------",rooms[0].operator.socket_id);
-      // console.log("user_socket-------",data.socket_id);
+
       
           const userName=await getUser(existRoom.mobile_user_id);
+          const operator=await getAdminById(existRoom.operator_id)
           existRoom.email=userName[0].email
           console.log("findedUser-----",userName);
+          console.log("findedOperator-----",operator);
+
           const messages=await getMessagesByRoomId(existRoom.id);
           existRoom.messages=messages
-      // socket.to(room.id).emit("roomCreated",{room:room.id})
-      // socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",existRoom)
+          console.log("changeExistroom-----",existRoom);
+
+
+      // io.to(operator.socket_id).emit("operatorNewJoin",{room:existRoom, new:false})
     }else{
       const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
-      console.log("room",room);
+      console.log("room-not-exist",room);
       currentRoom = room.id
       socket.join(room.id)
       console.log("operator_socket------",rooms[0].operator.socket_id);
       console.log("user_socket-------",data.socket_id);
       room.messages=[]
       // socket.to(room.id).emit("roomCreated",{room:room.id})
-      socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",room)
+      socket.to(rooms[0].operator.socket_id).emit("operatorNewJoin",{room, new:true})
     }
 
   })
@@ -94,6 +99,18 @@ io.on("connection", (socket) => {
   socket.on("markMessageAsRead", (data) => {
     io.to(data.id).emit("messageRead", data);
   });
+
+  socket.on("markMessageAsReadUser", (data) => {
+    io.to(data.id).emit("messageReadUser", data);
+  });
+
+  socket.on("userMessageWasReaded",(data)=>{
+    console.log("userMessageAlreadyReaded----",data);
+    io.to(data.id).emit("userMessageAlreadyReaded",data)
+  })
+  socket.on("operatorMessageWasReaded",(data)=>{
+    io.to(data.id).emit("operatorMessageAlreadyReaded",data)
+  })
 
 
 
