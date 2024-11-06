@@ -1,9 +1,19 @@
 // const { getAdmins, getUserByEmail, getAdmin, createAdminUser, updateAdminStatus } = require("../../DB/controller");
 const bcrypt=require("bcryptjs");
-const { UseDatabase, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus, updateSocketIdAdmin } = require("../../DB/controller");
+const { UseDatabase,getAdminsByGoverningAndOnline, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus, updateSocketIdAdmin } = require("../../DB/controller");
 
 
 const AdminService = { 
+  onlineExist: async (governing) => {
+    try {
+      await UseDatabase();
+      const users = await getAdminsByGoverningAndOnline(governing);
+      return users;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  },
   uptadeSocketId: async (id, socketId) => {
     try {
       await UseDatabase();
@@ -36,13 +46,13 @@ const AdminService = {
           return false;
         }
       },
-      register: async (name,surname,email,password,phone,status,governing) => {
+      register: async (name,surname,email,password,phone,online,governing) => {
         try {
           await UseDatabase();
 
           let salt = bcrypt.genSaltSync(8);
           password = bcrypt.hashSync(password, salt);
-          await createAdminUser(name,surname,email,password,phone,status,governing);
+          await createAdminUser(name,surname,email,password,phone,online,governing);
           return { message: "User created successfully" };
         } catch (error) {
           console.error(error);

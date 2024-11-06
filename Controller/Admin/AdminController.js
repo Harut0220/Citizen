@@ -4,6 +4,20 @@ const UserService = require("../../Service/User/UserService");
 
 
 const AdminController = {
+  onlineExist: async (req, res) => {
+    try {
+      const { governing } = req.body;
+      const result = await AdminService.onlineExist(governing);
+      if (result[0]) {
+        res.status(200).send({ message: "success" , operator: result[0]});
+      } else {
+        res.status(403).send({ message: "error" ,operator:[]});
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error");
+    }
+  },
   uptadeSocketId: async (req, res) => {
     try {
       const { id, socket_id } = req.body;
@@ -48,14 +62,14 @@ const AdminController = {
       register: async (req, res) => {
         try {
           const { name, surname, email, password, phone, governing } = req.body;
-          const status = true;
+          const online = true;
           const result = await AdminService.register(
             name,
             surname,
             email,
             password,
             phone,
-            status,
+            online,
             governing
           );
           if (result) {

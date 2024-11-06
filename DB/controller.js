@@ -39,7 +39,6 @@ const createAdminUserTable = async (device_id, type) => {
             password varchar(1000),
             phone varchar(200) NOT NULL,
             socket_id varchar(200) DEFAULT NULL,
-            status BOOLEAN DEFAULT TRUE,
             governing varchar(100),
             online BOOLEAN DEFAULT FALSE,
             PRIMARY KEY (id)
@@ -53,7 +52,7 @@ const createAdminUserTable = async (device_id, type) => {
 
 const getActivByGoverningOperator = async (governing) => {
   try {
-    const query = `SELECT * FROM users WHERE governing = '${governing}' AND status = 1;`;
+    const query = `SELECT * FROM users WHERE governing = '${governing}' AND online = 1;`;
     const [results] = await pool.query(query);
     return results;
   } catch (error) {
@@ -132,6 +131,17 @@ const getAdminsByGoverning = async (governing) => {
     return results;
   } catch (error) {
     console.error(error);
+  }
+};
+
+const getAdminsByGoverningAndOnline = async (governing) => {
+  try {
+    const query = `SELECT * FROM users WHERE governing = ? AND online = true`;
+    const [results] = await pool.query(query, [governing]);
+    return results;
+  } catch (error) {
+    console.error("Error fetching admins by governing and online status:", error);
+    throw error;
   }
 };
 
@@ -539,5 +549,6 @@ module.exports = {
   getActivByGoverningOperator,
   getRoomByOperatorId,
   getRoomByOperatorIdChat,
-  updateMessageSituation
+  updateMessageSituation,
+  getAdminsByGoverningAndOnline
 };

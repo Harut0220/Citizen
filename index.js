@@ -41,36 +41,43 @@ io.on("connection", (socket) => {
     console.log("active-----",activOperator);
     console.log("data-------",data);
     const rooms=[];
+    let existRooms=[];
     for (let i = 0; i < activOperator.length; i++) {
       let obj={}
       const room=await getRoomByOperatorId(activOperator[i].id)
       obj.operator=activOperator[i]
       obj.activRooms=room
       rooms.push(obj)
+     const existRoom=await findRoomExist(data.id,data.name,activOperator[i].id,data.message_category_id,data.governing_body_id)
+      if(existRoom.length){
+        existRooms.push(existRoom[0])
+      }
     }
     rooms.sort((a,b)=>a.activRooms.length-b.activRooms.length)
-    const existRoom=await findRoomExist(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id)
-    console.log("isexistto-----",existRoom);
-    console.log("type-exist-array",Array.isArray(existRoom))
-    if(!Array.isArray(existRoom)){
 
-      console.log("room-exist",existRoom);
-      currentRoom = existRoom.id
-      socket.join(existRoom.id)
+
+
+    console.log("isexistto-----",existRooms);
+    console.log("type-exist-array",Array.isArray(existRooms))
+    if(existRooms.length){
+
+      console.log("room-exist",existRooms[0]);
+      currentRoom = existRooms[0].id
+      socket.join(existRooms[0].id)
 
       
-          const userName=await getUser(existRoom.mobile_user_id);
-          const operator=await getAdminById(existRoom.operator_id)
-          existRoom.email=userName[0].email
+          const userName=await getUser(existRooms[0].mobile_user_id);
+          const operator=await getAdminById(existRooms[0].operator_id)
+          existRooms[0].email=userName[0].email
           console.log("findedUser-----",userName);
           console.log("findedOperator-----",operator);
 
-          const messages=await getMessagesByRoomId(existRoom.id);
-          existRoom.messages=messages
-          console.log("changeExistroom-----",existRoom);
+          const messages=await getMessagesByRoomId(existRooms[0].id);
+          existRooms[0].messages=messages
+          console.log("changeExistroom-----",existRooms[0]);
 
 
-      // io.to(operator.socket_id).emit("operatorNewJoin",{room:existRoom, new:false})
+      io.to(operator.socket_id).emit("operatorNewJoin",{room:existRooms[0], new:false})
     }else{
       const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
       console.log("room-not-exist",room);
