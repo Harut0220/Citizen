@@ -1,10 +1,26 @@
 // const { updateRoomStatus,createRoom } = require("../../DB/controller");
 
-const { UseDatabase, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId } = require("../../DB/controller");
+const { UseDatabase, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId, getRoomByUserDeviceIdChat } = require("../../DB/controller");
 
 
 
 const RoomService = {
+    getRoomByUser: async (user_id) => {
+        try {
+            await UseDatabase();
+            const rooms = await getRoomByUserDeviceIdChat(user_id);
+            for (let i = 0; i < rooms.length; i++) {
+                const userName=await getUser(rooms[i].mobile_user_id);
+                rooms[i].email=userName[0].email
+                const messages=await getMessagesByRoomId(rooms[i].id);
+                rooms[i].messages=messages
+            }
+            return rooms
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
     getRoom: async (operatorId) => {
         try {
             await UseDatabase();
@@ -56,7 +72,7 @@ const RoomService = {
             console.log(existUserName,"existUserName");
             console.log(existOperator,"existOperator");
             if(existUserName.length&&existOperator.length){
-                const room=await createRoom(mobile_user_id,mobile_user_name, operator_id, message_category_id, governing_body_id);
+                const room=await createRoom(mobile_user_id,mobile_user_name, operator_id, message_category_id, governing_body_id,existUserName[0].email);
                 return room
             }else{
                 return ({message:"User and Operator not found"});

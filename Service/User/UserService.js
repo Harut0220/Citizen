@@ -25,7 +25,7 @@ const UserService = {
       return false;
     }
   },
-  UserRegister: async (user_device, name,email,message_category_id,governing_body,socket_id,type) => {
+  UserRegister: async (user_device, name,phone_number,email,message_category_id,governing_body,socket_id,type) => {
     try {
       await UseDatabase();
       const existUser=await getUserByEmailExist(email)
@@ -33,7 +33,7 @@ const UserService = {
       if(existUser[0]){
         return existUser[0]
       }else{
-        const result = await createUser(user_device, name,email,message_category_id,governing_body,socket_id,type);
+        const result = await createUser(user_device, name,phone_number,email,message_category_id,governing_body,socket_id,type);
         console.log("not-exist-user---",result);
         return result;
       }

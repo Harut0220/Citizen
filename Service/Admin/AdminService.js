@@ -27,7 +27,7 @@ const AdminService = {
     getAdminByGoverning: async (governing) => {
         try {
           await UseDatabase();
-
+          
           const users = await getAdminsByGoverning(governing);
           return users;
         } catch (error) {
@@ -49,7 +49,7 @@ const AdminService = {
       register: async (name,surname,email,password,phone,online,governing) => {
         try {
           await UseDatabase();
-
+          
           let salt = bcrypt.genSaltSync(8);
           password = bcrypt.hashSync(password, salt);
           await createAdminUser(name,surname,email,password,phone,online,governing);
@@ -82,8 +82,8 @@ const AdminService = {
         try {
           await UseDatabase();
 
-          await updateAdminStatus(id, false);
-          return true;
+          const result=await updateAdminStatus(id, false);
+          return result;
         } catch (error) {
           console.error(error);
           return false;

@@ -28,7 +28,7 @@ const UseDatabase = async () => {
 };
 
 /////////////////// ADMIN
-const createAdminUserTable = async (device_id, type) => {
+const createAdminUserTable = async () => {
   try {
     const results = await pool.query(
       `create table users(
@@ -52,6 +52,8 @@ const createAdminUserTable = async (device_id, type) => {
 
 const getActivByGoverningOperator = async (governing) => {
   try {
+    console.log(governing,"dbGoverning");
+    
     const query = `SELECT * FROM users WHERE governing = '${governing}' AND online = 1;`;
     const [results] = await pool.query(query);
     return results;
@@ -126,8 +128,19 @@ const getAdminById = async (userId) => {
 
 const getAdminsByGoverning = async (governing) => {
   try {
-    const query = `SELECT * FROM users WHERE governing = '${governing}'`;
-    const [results] = await pool.query(query);
+  
+    
+    let query = `SELECT * FROM users`;
+    let params = [];
+    
+    if (governing) {
+      query += ` WHERE governing = ?`; // Add condition if userId is provided
+      params.push(governing);
+    }
+
+    const [results] = await pool.query(query, params);
+    console.log(results, "results");
+    
     return results;
   } catch (error) {
     console.error(error);
@@ -178,13 +191,14 @@ const getUserByEmail = async (email) => {
 
 /////////////////// USER
 
-const createUserTable = async (device_id, type) => {
+const createUserTable = async () => {
   try {
     const results = await pool.query(
       `CREATE TABLE mobile_users(
           id INT AUTO_INCREMENT,
           user_device varchar(200) NOT NULL,
           name varchar(2000) NOT NULL,
+          phone_number varchar(200) NOT NULL,
           email varchar(200) NOT NULL,
           message_category_id varchar(200) NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
@@ -194,6 +208,7 @@ const createUserTable = async (device_id, type) => {
           PRIMARY KEY (id)
   );`
     );
+    //type = Android,IOS
     return results;
   } catch (error) {
     console.error(error);
@@ -224,6 +239,7 @@ const updateSocketIdUser = async (id, socket_id) => {
 const createUser = async (
   user_device,
   name,
+  phone_number,
   email,
   message_category_id,
   governing_body_id,
@@ -234,6 +250,7 @@ const createUser = async (
     console.log(
       user_device,
       name,
+      phone_number,
       email,
       message_category_id,
       governing_body_id,
@@ -242,8 +259,8 @@ const createUser = async (
     );
 
     const result = await pool.query(
-      `INSERT INTO mobile_users(user_device, name,email,message_category_id,governing_body_id,socket_id,type) VALUES(?, ?, ?, ?, ?, ?, ?)`,
-      [user_device, name, email, message_category_id, governing_body_id,socket_id, type]
+      `INSERT INTO mobile_users(user_device, name,phone_number,email,message_category_id,governing_body_id,socket_id,type) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_device, name,phone_number, email, message_category_id, governing_body_id,socket_id, type]
     );
     const newUserId = result[0].insertId;
 
@@ -364,6 +381,20 @@ const getRoomByOperatorIdChat=async(operatorId)=>{
   }
 }
 
+const getRoomByUserDeviceIdChat=async(mobile_user_id)=>{
+  try {
+    const query = `
+        SELECT * 
+        FROM room 
+        WHERE mobile_user_id = ?;`;
+    const [rows] = await pool.query(query, [mobile_user_id]);
+    return rows;
+} catch (error) {
+    console.error('Error retrieving messages:', error);
+    throw error;
+  }
+}
+
 
 const getRoomByOperatorId = async (operatorId) => {
   try {
@@ -372,6 +403,20 @@ const getRoomByOperatorId = async (operatorId) => {
         FROM room 
         WHERE operator_id = ? AND activ = 1;`;
     const [rows] = await pool.query(query, [operatorId]);
+    return rows;
+  } catch (error) {
+    console.error('Error retrieving messages:', error);
+    throw error;
+  }
+}
+
+const getRoomById = async (roomId) => {
+  try {
+    const query = `
+        SELECT * 
+        FROM room 
+        WHERE operator_id = ?;`;
+    const [rows] = await pool.query(query, [roomId]);
     return rows;
   } catch (error) {
     console.error('Error retrieving messages:', error);
@@ -568,5 +613,7 @@ module.exports = {
   getRoomByOperatorIdChat,
   updateMessageSituation,
   getAdminsByGoverningAndOnline,
-  getUserByEmailExist
+  getUserByEmailExist,
+  getRoomByUserDeviceIdChat,
+  getRoomById
 };

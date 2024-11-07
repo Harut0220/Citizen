@@ -10,7 +10,6 @@ Route.use("/user",UserRouter);
 Route.use("/admin",AdminRouter);
 Route.use("/room", RoomRouter);
 Route.use("/message", MessageRouter);
-// Route.get("/update/user",UserRouter)
-// Route.get("/update/admin",AdminRouter)
+
 
 module.exports = Route;

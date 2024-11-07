@@ -34,7 +34,10 @@ const AdminController = {
   },
       getAdminByGoverning: async (req, res) => {
         try {
-          const {governing} = req.query
+        
+          const {governing}=req.params
+      
+          
           const result = await AdminService.getAdminByGoverning(governing);
           if (result) {
             res.status(200).send(result);
