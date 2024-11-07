@@ -3,7 +3,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
-const {getMessagesByRoomId,getAdminById, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
+const {getMessagesByRoomId,getAdminById,updateRoomStatus, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -48,7 +48,9 @@ io.on("connection", (socket) => {
       obj.operator=activOperator[i]
       obj.activRooms=room
       rooms.push(obj)
+      console.log("func-arg-----",data.id,data.name,activOperator[i].id,data.message_category_id,data.governing_body_id);
      const existRoom=await findRoomExist(data.id,data.name,activOperator[i].id,data.message_category_id,data.governing_body_id)
+     console.log("cikl exist------",existRoom);
       if(existRoom.length){
         existRooms.push(existRoom[0])
       }
@@ -73,11 +75,13 @@ io.on("connection", (socket) => {
           console.log("findedOperator-----",operator);
 
           const messages=await getMessagesByRoomId(existRooms[0].id);
-          existRooms[0].messages=messages
-          console.log("changeExistroom-----",existRooms[0]);
+          const room=await updateRoomStatus(existRooms[0].id, true);
+          room.messages=messages
+          console.log("changeExistroom-----",room);
 
-
-      io.to(operator.socket_id).emit("operatorNewJoin",{room:existRooms[0], new:false})
+      console.log("find exist-----",operator[0].socket_id);
+      io.to(operator[0].socket_id).emit("operatorNewJoin",{room:room, new:false})
+      // io.to(operator.socket_id).emit("operatorOldRoomConnect",existRooms)
     }else{
       const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
       console.log("room-not-exist",room);

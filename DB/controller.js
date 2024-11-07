@@ -308,6 +308,23 @@ const getUserByNmaeAndId = async (id,name) => {
 }
 }
 
+const getUserByEmailExist = async (email) => {
+  try {
+    let query = `SELECT * FROM mobile_users`;
+    let params = [];
+
+    if (email) {
+      query += ` WHERE email = ?`; // Add condition if userId is provided
+      params.push(email);
+    }
+
+    const [results] = await pool.query(query, params);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 
 /////////////////// ROOM
@@ -550,5 +567,6 @@ module.exports = {
   getRoomByOperatorId,
   getRoomByOperatorIdChat,
   updateMessageSituation,
-  getAdminsByGoverningAndOnline
+  getAdminsByGoverningAndOnline,
+  getUserByEmailExist
 };

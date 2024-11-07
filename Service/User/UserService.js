@@ -1,6 +1,6 @@
 // const {createUser, getUser, getAdmins } = require("../../DB/controller");
 
-const { UseDatabase, createUser, updateSocketIdUser } = require("../../DB/controller");
+const { UseDatabase, createUser, updateSocketIdUser,getUserByEmailExist } = require("../../DB/controller");
 
 
 const UserService = {
@@ -28,9 +28,16 @@ const UserService = {
   UserRegister: async (user_device, name,email,message_category_id,governing_body,socket_id,type) => {
     try {
       await UseDatabase();
+      const existUser=await getUserByEmailExist(email)
+      console.log("exist--user",existUser);
+      if(existUser[0]){
+        return existUser[0]
+      }else{
+        const result = await createUser(user_device, name,email,message_category_id,governing_body,socket_id,type);
+        console.log("not-exist-user---",result);
+        return result;
+      }
 
-     const result = await createUser(user_device, name,email,message_category_id,governing_body,socket_id,type);
-      return result;
     } catch (error) {
       console.error(error);
       return false;

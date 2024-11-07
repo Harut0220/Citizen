@@ -26,6 +26,8 @@ const RoomService = {
         try {
             await UseDatabase();
             const room=await updateRoomStatus(id, false);
+            const message=await getMessagesByRoomId(id)
+            room.messages=message
             return room
         } catch (error) {
             console.error(error);
