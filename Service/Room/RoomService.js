@@ -1,7 +1,7 @@
 // const { updateRoomStatus,createRoom } = require("../../DB/controller");
 
-const { UseDatabase, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId, getRoomByUserDeviceIdChat } = require("../../DB/controller");
-
+const { UseDatabase,createMessage, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId, getRoomByUserDeviceIdChat } = require("../../DB/controller");
+const moment = require('moment');
 
 
 const RoomService = {
@@ -41,7 +41,11 @@ const RoomService = {
     deactiveRoom: async (id) => {
         try {
             await UseDatabase();
+
+            const created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+            const results = await createMessage(id, 0, "Room closed", "closed",created_at);
             const room=await updateRoomStatus(id, false);
+
             const message=await getMessagesByRoomId(id)
             room.messages=message
             return room

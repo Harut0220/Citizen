@@ -3,8 +3,8 @@ const {validator}=require("../Helper/Validator");
 // room_id, writer_id, content, writer 
 const createMessage = async (req, res, next) => {
     const validationRule = {
-        "room_id": "required|string",
-        "writer_id": "required|string",
+        "room_id": "required|integer",
+        "writer_id": "required|integer",
         "content": "required|string",
         "writer": "required|string",
     };

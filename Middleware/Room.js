@@ -38,7 +38,7 @@ const {validator}=require("../Helper/Validator");
 
   const ActiveRoom = async (req, res, next) => {
     const validationRule = {
-        "id": "required|string",
+        "id": "required|integer",
     };
     try {
 
