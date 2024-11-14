@@ -32,7 +32,7 @@ const UserController = {
     try {
       const {user_device,name,phone_number,email,message_category_id,governing_body,socket_id,type} = req.body;
       console.log(
-        user_device,);
+        user_device);
       
       const result = await UserService.UserRegister(
         user_device,

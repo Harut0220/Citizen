@@ -3,7 +3,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
-const {getMessagesByRoomId,getAdminById,updateRoomStatus, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist} = require("./DB/controller");
+const {getMessagesByRoomId,getAdminById,updateRoomStatus, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist, getRole, getModelHasRole, getGoverningBody} = require("./DB/controller");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -37,7 +37,15 @@ io.on("connection", (socket) => {
   })
 
   socket.on("searchAdmin", async(data)=>{
-    const activOperator=await getActivByGoverningOperator(data.governing_body_id)
+    // const activOperator=await getActivByGoverningOperator(data.governing_body_id)
+    const governingBody=await getGoverningBody(data.governing_body_id)
+    console.log(governingBody);
+    
+    let activOperator=[]
+    for (let z = 0; z < governingBody.length; z++) {
+      const activOperators=await getActivByGoverningOperator(governingBody[z].user_id)
+      activOperator.push(activOperators[0])
+    }
     console.log("active-----",activOperator);
     console.log("data-------",data);
     const rooms=[];
@@ -45,6 +53,8 @@ io.on("connection", (socket) => {
     for (let i = 0; i < activOperator.length; i++) {
       let obj={}
       const room=await getRoomByOperatorId(activOperator[i].id)
+      console.log("room-----",room);
+      
       obj.operator=activOperator[i]
       obj.activRooms=room
       rooms.push(obj)
@@ -87,6 +97,8 @@ io.on("connection", (socket) => {
       console.log("room-not-exist",room);
       currentRoom = room.id
       socket.join(room.id)
+      console.log("rooms[0].operator.socket_id",rooms[0].operator.socket_id);
+      
       console.log("operator_socket------",rooms[0].operator.socket_id);
       console.log("user_socket-------",data.socket_id);
       room.messages=[]
@@ -130,6 +142,21 @@ io.on("connection", (socket) => {
 
 
 app.use("/api", Route);
+
+app.get("/operator", async(req, res) => {
+  const {governing_body_id}=req.body
+
+  const governingBody=await getGoverningBody(governing_body_id)
+  console.log(governingBody);
+  
+  let activOperators=[]
+  for (let z = 0; z < governingBody.length; z++) {
+    const activOperator=await getActivByGoverningOperator(governingBody[z].user_id)
+    activOperators.push(activOperator[0])
+  }
+
+  res.send(activOperators);
+})
 
 
 const PORT = process.env.PORT || 3000;

@@ -5,11 +5,15 @@ const { CreateRoom, ActiveRoom, getRoom } = require("../../Middleware/Room");
 
 
 const RoomRouter = Router();
-
-RoomRouter.post("/create",CreateRoom,RoomController.createRoom)
-RoomRouter.post("/active",ActiveRoom,RoomController.activeRoom)
-RoomRouter.post("/deactive",ActiveRoom,RoomController.deactiveRoom)
-RoomRouter.get("/get/rooms/operator/:id",getRoom,RoomController.getRoom)
-RoomRouter.get("/get/rooms/user/:id",getRoom,RoomController.getRoomByUser)
+//CreateRoom,
+RoomRouter.post("/create",RoomController.createRoom)
+//ActiveRoom,
+RoomRouter.post("/active",RoomController.activeRoom)
+//ActiveRoom,
+RoomRouter.post("/deactive",RoomController.deactiveRoom)
+//getRoom,
+RoomRouter.get("/get/rooms/operator/:id",RoomController.getRoom)
+//getRoom,
+RoomRouter.get("/get/rooms/user/:id",RoomController.getRoomByUser)
 
 module.exports = RoomRouter

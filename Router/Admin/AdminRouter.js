@@ -4,15 +4,20 @@ const { AdminByGoverning, AdminByGoverningByBody, AdminRegister, AdminAuth, Admi
 // const { AdminByGoverning } = require("../../Middleware/Admin");
 
 const AdminRouter = Router();
-
-AdminRouter.get("/by/governing/:governing",AdminByGoverning,AdminController.getAdminByGoverning)
-AdminRouter.post("/online/exist",AdminByGoverningByBody,AdminController.onlineExist)
+//AdminByGoverning,
+AdminRouter.get("/by/governing/:governing",AdminController.getAdminByGoverning)
+//AdminByGoverningByBody,
+AdminRouter.post("/online/exist",AdminController.onlineExist)
 AdminRouter.get("/getById/:id",AdminController.getAdminUser)
-AdminRouter.post("/register",AdminRegister,AdminController.register)
+//AdminRegister,
+AdminRouter.post("/register",AdminController.register)
 AdminRouter.post("/login",AdminController.login)
-AdminRouter.post("/status/offline",AdminAuth,AdminController.statusOffline)
-AdminRouter.post("/status/online",AdminAuth,AdminController.statusOnline)
-AdminRouter.post("/update/socketId",AdminUpdateSocketId,AdminController.uptadeSocketId)
+//AdminAuth,
+AdminRouter.post("/status/offline",AdminController.statusOffline)
+//AdminAuth,
+AdminRouter.post("/status/online",AdminController.statusOnline)
+//AdminUpdateSocketId,
+AdminRouter.post("/update/socketId",AdminController.uptadeSocketId)
 
 
 module.exports = AdminRouter

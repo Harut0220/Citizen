@@ -7,7 +7,9 @@ const UserService = {
   uptadeSocketId: async (id, socketId) => {
     try {
       await UseDatabase();
-      const result = await updateSocketIdUser(id, socketId);
+      const updated_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
+      const result = await updateSocketIdUser(id, socketId,updated_at);
       return result;
     } catch (error) {
       console.error(error);
@@ -33,7 +35,9 @@ const UserService = {
       if(existUser[0]){
         return existUser[0]
       }else{
-        const result = await createUser(user_device, name,phone_number,email,message_category_id,governing_body,socket_id,type);
+        const created_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
+        const result = await createUser(user_device, name,phone_number,email,message_category_id,governing_body,socket_id,type,created_at);
         console.log("not-exist-user---",result);
         return result;
       }

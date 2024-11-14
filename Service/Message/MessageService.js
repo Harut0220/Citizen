@@ -29,7 +29,7 @@ const MessageService = {
   send: async (room_id, writer_id, content, writer) => {
     try {
       await UseDatabase();
-      const created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+      const created_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
       const results = await createMessage(room_id, writer_id, content, writer,created_at);
       return { message: "Message sent successfully",message:results };
     } catch (error) {

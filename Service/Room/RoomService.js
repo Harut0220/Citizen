@@ -76,7 +76,9 @@ const RoomService = {
             console.log(existUserName,"existUserName");
             console.log(existOperator,"existOperator");
             if(existUserName.length&&existOperator.length){
-                const room=await createRoom(mobile_user_id,mobile_user_name, operator_id, message_category_id, governing_body_id,existUserName[0].email);
+                const created_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
+                const room=await createRoom(mobile_user_id,mobile_user_name, operator_id, message_category_id, governing_body_id,existUserName[0].email,created_at);
                 return room
             }else{
                 return ({message:"User and Operator not found"});

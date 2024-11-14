@@ -33,14 +33,20 @@ const createAdminUserTable = async () => {
     const results = await pool.query(
       `create table users(
             id INT AUTO_INCREMENT,
-            name varchar(200) NOT NULL,
-            surname varchar(2000) NOT NULL,
-            email varchar(200) NOT NULL,
-            password varchar(1000),
-            phone varchar(200) NOT NULL,
-            socket_id varchar(200) DEFAULT NULL,
-            governing varchar(100),
+            name varchar(255) NOT NULL,
+            surname varchar(255) NOT NULL,
+            email varchar(255) NOT NULL,
+            email_verified_at timestamp NULL DEFAULT NULL,
+            password varchar(255),
+            phone varchar(255) NOT NULL,
+            status tinyint(1) NOT NULL DEFAULT '1',
+            password_changes_at varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            remember_token varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            socket_id varchar(255) DEFAULT NULL,
             online BOOLEAN DEFAULT FALSE,
+            deleted_at TIMESTAMP NULL DEFAULT NULL,
+            created_at TIMESTAMP NULL DEFAULT NULL,
+            updated_at TIMESTAMP NULL DEFAULT NULL,
             PRIMARY KEY (id)
     );`
     );
@@ -54,7 +60,7 @@ const getActivByGoverningOperator = async (governing) => {
   try {
     console.log(governing,"dbGoverning");
     
-    const query = `SELECT * FROM users WHERE governing = '${governing}' AND online = 1;`;
+    const query = `SELECT * FROM users WHERE id = '${governing}' AND online = 1;`;
     const [results] = await pool.query(query);
     return results;
   } catch (error) {
@@ -64,10 +70,12 @@ const getActivByGoverningOperator = async (governing) => {
 
 const updateSocketIdAdmin = async (id, socket_id) => {
   try {
+    const updated_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
     // First, update the socket_id
     await pool.query(
-      `UPDATE users SET socket_id = ? WHERE id = ?`,
-      [socket_id, id]
+      `UPDATE users SET socket_id = ?, updated_at = ? WHERE id = ?`,
+      [socket_id,updated_at, id]
     );
 
     // Then, retrieve the updated data
@@ -160,10 +168,12 @@ const getAdminsByGoverningAndOnline = async (governing) => {
 
 const updateAdminStatus = async (userId, newStatus) => {
   try {
+    const updated_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
     // Update the user's online status
     await pool.query(
-      `UPDATE users SET online = ? WHERE id = ?`,
-      [newStatus, userId]
+      `UPDATE users SET online = ?, updated_at = ? WHERE id = ?`,
+      [newStatus,updated_at, userId]
     );
 
     // Retrieve and return the updated user data
@@ -196,15 +206,18 @@ const createUserTable = async () => {
     const results = await pool.query(
       `CREATE TABLE mobile_users(
           id INT AUTO_INCREMENT,
-          user_device varchar(200) NOT NULL,
-          name varchar(2000) NOT NULL,
-          phone_number varchar(200) NOT NULL,
-          email varchar(200) NOT NULL,
-          message_category_id varchar(200) NOT NULL,
+          device_id varchar(255) NOT NULL,
+          name varchar(255) NOT NULL,
+          phone_number varchar(255) NOT NULL,
+          email varchar(255) NOT NULL,
+          message_category_id BIGINT UNSIGNED NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
-          governing_body_id varchar(200),
-          socket_id varchar(200) NOT NULL,
-          type varchar(200) NOT NULL,
+          governing_body_id BIGINT UNSIGNED NOT NULL,
+          socket_id varchar(255) NOT NULL,
+          type varchar(255) NOT NULL,
+          deleted_at TIMESTAMP NULL DEFAULT NULL,
+          created_at TIMESTAMP NULL DEFAULT NULL,
+          updated_at TIMESTAMP NULL DEFAULT NULL,
           PRIMARY KEY (id)
   );`
     );
@@ -218,10 +231,12 @@ const createUserTable = async () => {
 
 const updateSocketIdUser = async (id, socket_id) => {
   try {
+    const updated_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
     // First, update the socket_id
     await pool.query(
-      `UPDATE mobile_users SET socket_id = ? WHERE id = ?`,
-      [socket_id, id]
+      `UPDATE mobile_users SET socket_id = ?, updated_at = ? WHERE id = ?`,
+      [socket_id,updated_at, id]
     );
 
     // Then, retrieve the updated data
@@ -237,30 +252,32 @@ const updateSocketIdUser = async (id, socket_id) => {
 };
 
 const createUser = async (
-  user_device,
+  device_id,
   name,
   phone_number,
   email,
   message_category_id,
   governing_body_id,
   socket_id,
-  type
+  type,
+  created_at
 ) => {
   try {
     console.log(
-      user_device,
+      device_id,
       name,
       phone_number,
       email,
       message_category_id,
       governing_body_id,
       socket_id,
-      type
+      type,
+      created_at
     );
 
     const result = await pool.query(
-      `INSERT INTO mobile_users(user_device, name,phone_number,email,message_category_id,governing_body_id,socket_id,type) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
-      [user_device, name,phone_number, email, message_category_id, governing_body_id,socket_id, type]
+      `INSERT INTO mobile_users(device_id, name,phone_number,email,message_category_id,governing_body_id,socket_id,type,created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [device_id, name,phone_number, email, message_category_id, governing_body_id,socket_id, type,created_at]
     );
     const newUserId = result[0].insertId;
 
@@ -349,15 +366,18 @@ const getUserByEmailExist = async (email) => {
 const createTableRoom = async (room_id, writer_id, content, type) => {
   try {
     const results = await pool.query(
-      `CREATE TABLE room(
+      `CREATE TABLE rooms(
           id INT AUTO_INCREMENT,
-          mobile_user_id INT NOT NULL,
-          mobile_user_name varchar(200) NOT NULL,
-          operator_id INT NOT NULL,
-          message_category_id varchar(200) NOT NULL,
+          mobile_user_id BIGINT UNSIGNED NOT NULL,
+          mobile_user_name varchar(255) NOT NULL,
+          operator_id BIGINT UNSIGNED NOT NULL,
+          message_category_id BIGINT UNSIGNED NOT NULL,
           activ BOOLEAN DEFAULT TRUE,
-          governing_body varchar(200),
-          email varchar(200) NOT NULL,
+          governing_body_id BIGINT UNSIGNED NOT NULL,
+          email varchar(255) NOT NULL,
+          deleted_at TIMESTAMP NULL DEFAULT NULL,
+          created_at TIMESTAMP NULL DEFAULT NULL,
+          updated_at TIMESTAMP NULL DEFAULT NULL,
           PRIMARY KEY (id)
   );`
     );
@@ -371,7 +391,7 @@ const getRoomByOperatorIdChat=async(operatorId)=>{
   try {
     const query = `
         SELECT * 
-        FROM room 
+        FROM rooms
         WHERE operator_id = ?;`;
     const [rows] = await pool.query(query, [operatorId]);
     return rows;
@@ -385,7 +405,7 @@ const getRoomByUserDeviceIdChat=async(mobile_user_id)=>{
   try {
     const query = `
         SELECT * 
-        FROM room 
+        FROM rooms 
         WHERE mobile_user_id = ?;`;
     const [rows] = await pool.query(query, [mobile_user_id]);
     return rows;
@@ -400,7 +420,7 @@ const getRoomByOperatorId = async (operatorId) => {
   try {
     const query = `
         SELECT * 
-        FROM room 
+        FROM rooms 
         WHERE operator_id = ? AND activ = 1;`;
     const [rows] = await pool.query(query, [operatorId]);
     return rows;
@@ -414,7 +434,7 @@ const getRoomById = async (roomId) => {
   try {
     const query = `
         SELECT * 
-        FROM room 
+        FROM rooms 
         WHERE operator_id = ?;`;
     const [rows] = await pool.query(query, [roomId]);
     return rows;
@@ -430,19 +450,21 @@ const createRoom = async (
   operator_id,
   message_category_id,
   governing_body,
-  email
+  email,
+  created_at
 ) => {
   try {
     // Insert a new room
     const result = await pool.query(
-      `INSERT INTO room (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body,email) VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO rooms (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body_id,email,created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         mobile_user_id,
         mobile_user_name,
         operator_id,
         message_category_id,
         governing_body,
-        email
+        email,
+        created_at
       ]
     );
 
@@ -450,7 +472,7 @@ const createRoom = async (
     const newRoomId = result[0].insertId;
 
     // Retrieve the newly inserted room data, if needed
-    const [rows] = await pool.query(`SELECT * FROM room WHERE id = ?`, [
+    const [rows] = await pool.query(`SELECT * FROM rooms WHERE id = ?`, [
       newRoomId,
     ]);
 
@@ -465,12 +487,12 @@ const findRoomExist = async(mobile_user_id, mobile_user_name,operator_id,message
   try {
     const query = `
         SELECT * 
-        FROM room 
+        FROM rooms 
         WHERE mobile_user_id = ? 
           AND mobile_user_name = ?
           AND operator_id = ?
           AND message_category_id = ?
-          AND governing_body = ?;`;
+          AND governing_body_id = ?;`;
     const [rows] = await pool.query(query, [mobile_user_id, mobile_user_name,operator_id,message_category_id,governing_body_id]);
     return rows;
 } catch (error) {
@@ -483,15 +505,17 @@ const findRoomExist = async(mobile_user_id, mobile_user_name,operator_id,message
 const updateRoomStatus = async (roomId, newStatus) => {
   try {
     // const newStatus = true;
+    const updated_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
 
     // Update the message status
-    await pool.query(`UPDATE room SET activ = ? WHERE id = ?`, [
+    await pool.query(`UPDATE rooms SET activ = ?, updated_at = ? WHERE id = ?`, [
       newStatus,
-      roomId,
+      updated_at,
+      roomId
     ]);
 
     // Retrieve the updated message
-    const [results] = await pool.query(`SELECT * FROM room WHERE id = ?`, [
+    const [results] = await pool.query(`SELECT * FROM rooms WHERE id = ?`, [
       roomId,
     ]);
 
@@ -510,11 +534,13 @@ const createMessageTable = async () => {
       `CREATE TABLE messages(
           id INT AUTO_INCREMENT,
           room_id INT NOT NULL,
-          writer_id INT NOT NULL,
-          content varchar(200) NOT NULL,
-          writer varchar(20) NOT NULL,
+          writer_id BIGINT UNSIGNED NOT NULL,
+          content varchar(255) NOT NULL,
+          writer varchar(255) NOT NULL,
           readed BOOLEAN DEFAULT FALSE,
-          created_at varchar(200) NOT NULL,
+          deleted_at TIMESTAMP NULL DEFAULT NULL,
+          created_at TIMESTAMP NULL DEFAULT NULL,
+          updated_at TIMESTAMP NULL DEFAULT NULL,
           PRIMARY KEY (id)
   );`
     );
@@ -547,11 +573,13 @@ const updateMessageSituation = async (message_id) => {
   try {
     const newStatus = true;
     console.log("message_id",message_id);
-    
+    const updated_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
     // Update the message status
-    await pool.query(`UPDATE messages SET readed = ? WHERE id = ?`, [
+    await pool.query(`UPDATE messages SET readed = ?, updated_at = ? WHERE id = ?`, [
       newStatus,
-      message_id,
+      updated_at,
+      message_id
     ]);
 
     // Retrieve the updated message
@@ -588,7 +616,64 @@ const getMessagesByRoomId = async (roomId) => {
   }
 };
 
+
+const getRole=async(role_name)=>{
+  try {
+    let query = `SELECT * FROM roles`;
+    let params = [];
+
+    if (role_name) {
+      query += ` WHERE name = ?`; // Add condition if userId is provided
+      params.push(role_name);
+    }
+
+    const [results] = await pool.query(query, params);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const getModelHasRole=async(role_id)=>{
+  try {
+    let query = `SELECT * FROM model_has_roles`;
+    let params = [];
+
+    if (role_id) {
+      query += ` WHERE role_id = ?`; // Add condition if userId is provided
+      params.push(role_id);
+    }
+
+    const [results] = await pool.query(query, params);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+
+const getGoverningBody=async(role_id)=>{
+  try {
+    let query = `SELECT * FROM governing_body_users`;
+    let params = [];
+
+    if (role_id) {
+      query += ` WHERE governing_body_id = ?`; // Add condition if userId is provided
+      params.push(role_id);
+    }
+
+    const [results] = await pool.query(query, params);
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 module.exports = {
+  getGoverningBody,
+  getModelHasRole,
+  getRole,
   createAdminUser,
   createTableRoom,
   createRoom,
