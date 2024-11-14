@@ -1,6 +1,7 @@
 // const { pool } = require("./connection");
 const mysql = require("mysql2");
 const dotenv = require("dotenv");
+const moment = require('moment-timezone');
 
 dotenv.config();
 
@@ -285,7 +286,8 @@ const createUser = async (
     const [rows] = await pool.query(`SELECT * FROM mobile_users WHERE id = ?`, [
       newUserId,
     ]);
-
+    console.log(rows[0],"rows[0]");
+    
     return rows[0];
   } catch (error) {
     console.error(error);
@@ -539,7 +541,7 @@ const createMessageTable = async () => {
           writer varchar(255) NOT NULL,
           readed BOOLEAN DEFAULT FALSE,
           deleted_at TIMESTAMP NULL DEFAULT NULL,
-          created_at TIMESTAMP NULL DEFAULT NULL,
+          created_at varchar(200) NOT NULL,
           updated_at TIMESTAMP NULL DEFAULT NULL,
           PRIMARY KEY (id)
   );`

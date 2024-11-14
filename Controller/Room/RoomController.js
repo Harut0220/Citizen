@@ -20,7 +20,11 @@ const RoomController = {
     getRoom: async (req, res) => {
         try {
             const {id} = req.params;
+            console.log(id,"operatorId");
+            
             const getRoomDb=await getRoomById(id);
+            console.log(getRoomDb,"getRoomDb");
+            
             if (getRoomDb.length) {
                 const result = await RoomService.getRoom(id);
                 if (result) {
@@ -29,7 +33,7 @@ const RoomController = {
                     res.status(403).send("Error");
                 } 
             }else{
-                res.status(404).send({message:"Room not found"});
+                res.status(200).send([]);
             }
 
         } catch (error) {

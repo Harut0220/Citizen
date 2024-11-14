@@ -1,7 +1,7 @@
 // const {createUser, getUser, getAdmins } = require("../../DB/controller");
 
 const { UseDatabase, createUser, updateSocketIdUser,getUserByEmailExist } = require("../../DB/controller");
-
+const moment = require("moment-timezone");
 
 const UserService = {
   uptadeSocketId: async (id, socketId) => {
@@ -33,6 +33,8 @@ const UserService = {
       const existUser=await getUserByEmailExist(email)
       console.log("exist--user",existUser);
       if(existUser[0]){
+        console.log("exist-user---",existUser[0]);
+        
         return existUser[0]
       }else{
         const created_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");

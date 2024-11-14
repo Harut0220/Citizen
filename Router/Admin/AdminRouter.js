@@ -19,5 +19,7 @@ AdminRouter.post("/status/online",AdminController.statusOnline)
 //AdminUpdateSocketId,
 AdminRouter.post("/update/socketId",AdminController.uptadeSocketId)
 
+AdminRouter.post("/auth/me",AdminController.authMe)
+
 
 module.exports = AdminRouter

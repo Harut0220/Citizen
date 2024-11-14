@@ -3,7 +3,17 @@ const bcrypt=require("bcryptjs");
 const { UseDatabase,getAdminsByGoverningAndOnline, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus, updateSocketIdAdmin } = require("../../DB/controller");
 
 
-const AdminService = { 
+const AdminService = {
+  authMe: async (id) => {
+    try {
+      await UseDatabase();
+      const users = await getAdminById(id);
+      return users;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  } ,
   onlineExist: async (governing) => {
     try {
       await UseDatabase();

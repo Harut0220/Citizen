@@ -3,6 +3,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const Route = require("./Router/Router");
+const moment = require("moment-timezone");
 const {getMessagesByRoomId,getAdminById,updateRoomStatus, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist, getRole, getModelHasRole, getGoverningBody} = require("./DB/controller");
 const app = express();
 const server = http.createServer(app);
@@ -10,7 +11,7 @@ const io = new Server(server, {
   pingInterval: 25000, 
   pingTimeout: 10000,
   cors: {
-    origin: ["http://localhost:3000","http://localhost:3001"], // Ensure this matches your frontend
+    origin: ["https://citizenu.trigger.ltd","https://citizenw.trigger.ltd"], // Ensure this matches your frontend
     methods: ["GET", "POST"],
   },
 });
@@ -43,6 +44,8 @@ io.on("connection", (socket) => {
     
     let activOperator=[]
     for (let z = 0; z < governingBody.length; z++) {
+      console.log("governingBody[z].user_id",governingBody[z].user_id);
+      
       const activOperators=await getActivByGoverningOperator(governingBody[z].user_id)
       activOperator.push(activOperators[0])
     }
@@ -142,6 +145,8 @@ io.on("connection", (socket) => {
 
 
 app.use("/api", Route);
+const date = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+console.log(date);
 
 app.get("/operator", async(req, res) => {
   const {governing_body_id}=req.body

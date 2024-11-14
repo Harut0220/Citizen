@@ -4,6 +4,22 @@ const UserService = require("../../Service/User/UserService");
 
 
 const AdminController = {
+  authMe: async (req, res) => {
+    try {
+      const auth = req.headers.authorization;
+      const id = auth.split(" ")[1];
+
+      const result = await AdminService.authMe(id);
+      if (result) {
+        res.status(200).send(result);
+      } else {
+        res.status(403).send("Error");
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error");
+    }
+  },
   onlineExist: async (req, res) => {
     try {
       const { governing } = req.body;
