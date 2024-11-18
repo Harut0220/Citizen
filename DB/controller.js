@@ -21,7 +21,7 @@ const pool = mysql
 
 const UseDatabase = async () => {
   try {
-    const results = await pool.query(`USE citizen;`);
+    const results = await pool.query(`USE citizen_in_uniform;`);
     return results;
   } catch (error) {
     console.error(error);
@@ -205,7 +205,7 @@ const getUserByEmail = async (email) => {
 const createUserTable = async () => {
   try {
     const results = await pool.query(
-      `CREATE TABLE mobile_users(
+      `CREATE TABLE mobile_users_infos(
           id INT AUTO_INCREMENT,
           device_id varchar(255) NOT NULL,
           name varchar(255) NOT NULL,
@@ -236,13 +236,13 @@ const updateSocketIdUser = async (id, socket_id) => {
 
     // First, update the socket_id
     await pool.query(
-      `UPDATE mobile_users SET socket_id = ?, updated_at = ? WHERE id = ?`,
+      `UPDATE mobile_users_infos SET socket_id = ?, updated_at = ? WHERE id = ?`,
       [socket_id,updated_at, id]
     );
 
     // Then, retrieve the updated data
     const [updatedUser] = await pool.query(
-      `SELECT * FROM mobile_users WHERE id = ?`,
+      `SELECT * FROM mobile_users_infos WHERE id = ?`,
       [id]
     );
 
@@ -277,13 +277,13 @@ const createUser = async (
     );
 
     const result = await pool.query(
-      `INSERT INTO mobile_users(device_id, name,phone_number,email,message_category_id,governing_body_id,socket_id,type,created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO mobile_users_infos(device_id, name,phone_number,email,message_category_id,governing_body_id,socket_id,type,created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [device_id, name,phone_number, email, message_category_id, governing_body_id,socket_id, type,created_at]
     );
     const newUserId = result[0].insertId;
 
     // Retrieve the newly inserted room data, if needed
-    const [rows] = await pool.query(`SELECT * FROM mobile_users WHERE id = ?`, [
+    const [rows] = await pool.query(`SELECT * FROM mobile_users_infos WHERE id = ?`, [
       newUserId,
     ]);
     console.log(rows[0],"rows[0]");
@@ -295,7 +295,7 @@ const createUser = async (
 };
 const getUser = async (userId) => {
   try {
-    let query = `SELECT * FROM mobile_users`;
+    let query = `SELECT * FROM mobile_users_infos`;
     let params = [];
 
     if (userId) {
@@ -312,7 +312,7 @@ const getUser = async (userId) => {
 
 const getUserName=async(userId)=>{
   try {
-    let query = `SELECT * FROM mobile_users`;
+    let query = `SELECT * FROM mobile_users_infos`;
     let params = [];
 
     if (userId) {
@@ -333,7 +333,7 @@ const getUserByNmaeAndId = async (id,name) => {
     
     const query = `
         SELECT * 
-        FROM mobile_users 
+        FROM mobile_users_infos 
         WHERE id = ? 
           AND name = ?;`;
     const [rows] = await pool.query(query, [id,name]);
@@ -346,7 +346,7 @@ const getUserByNmaeAndId = async (id,name) => {
 
 const getUserByEmailExist = async (email) => {
   try {
-    let query = `SELECT * FROM mobile_users`;
+    let query = `SELECT * FROM mobile_users_infos`;
     let params = [];
 
     if (email) {
@@ -453,9 +453,10 @@ const createRoom = async (
   message_category_id,
   governing_body,
   email,
-  created_at
 ) => {
   try {
+    const created_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
+
     // Insert a new room
     const result = await pool.query(
       `INSERT INTO rooms (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body_id,email,created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,

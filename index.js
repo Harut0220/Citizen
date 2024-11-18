@@ -47,7 +47,9 @@ io.on("connection", (socket) => {
       console.log("governingBody[z].user_id",governingBody[z].user_id);
       
       const activOperators=await getActivByGoverningOperator(governingBody[z].user_id)
-      activOperator.push(activOperators[0])
+      if(activOperators[0]){
+        activOperator.push(activOperators[0])
+      }
     }
     console.log("active-----",activOperator);
     console.log("data-------",data);
