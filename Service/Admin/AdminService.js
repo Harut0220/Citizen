@@ -1,6 +1,6 @@
 // const { getAdmins, getUserByEmail, getAdmin, createAdminUser, updateAdminStatus } = require("../../DB/controller");
 const bcrypt=require("bcryptjs");
-const { UseDatabase,getAdminsByGoverningAndOnline, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus, updateSocketIdAdmin } = require("../../DB/controller");
+const { UseDatabase,getAdminsByGoverningAndOnline, getAdminsByGoverning, getAdminById, createAdminUser, getUserByEmail, updateAdminStatus, updateSocketIdAdmin, getGoverningBody, getActivByGoverningOperator } = require("../../DB/controller");
 
 
 const AdminService = {
@@ -14,11 +14,18 @@ const AdminService = {
       return false;
     }
   } ,
-  onlineExist: async (governing) => {
+  onlineExist: async (governing_id) => {
     try {
       await UseDatabase();
-      const users = await getAdminsByGoverningAndOnline(governing);
-      return users;
+      const users_body = await getGoverningBody(governing_id);
+        let activOperators=[]
+
+      for (let z = 0; z < users_body.length; z++) {
+        const activOperator=await getActivByGoverningOperator(users_body[z].user_id)
+        activOperators.push(activOperator[0])
+      }
+      // const users = await getAdminsByGoverningAndOnline(governing_id);
+      return activOperators;
     } catch (error) {
       console.error(error);
       return false;

@@ -30,19 +30,15 @@ const UserController = {
   },
   UserRegister: async (req, res) => {
     try {
-      const {user_device,name,phone_number,email,message_category_id,governing_body,socket_id,type} = req.body;
-      console.log(
-        user_device);
+      const {name,phone_number,email,message_category_id,governing_body,socket_id} = req.body;
       
       const result = await UserService.UserRegister(
-        user_device,
         name,
         phone_number,
         email,
         message_category_id,
         governing_body,
         socket_id,
-        type
       );
       if (result) {
         res.status(200).send(result);

@@ -4,16 +4,13 @@ const {validator}=require("../Helper/Validator");
 
 
 const UserAuth = async (req, res, next) => {
-    // user_device,name,phone_number,email,message_category_id,governing_body,socket_id,type
     const validationRule = {
-        user_device: "required|string",
         name: "required|string",
         phone_number: "required|string",
         email: "required|string",
         message_category_id: "required|string",
         governing_body: "required|string",
         socket_id: "required|string",
-        type: "required|string",
       };
     
       // Fetch admin user by ID and update socket_id

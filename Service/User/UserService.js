@@ -27,7 +27,7 @@ const UserService = {
       return false;
     }
   },
-  UserRegister: async (user_device, name,phone_number,email,message_category_id,governing_body,socket_id,type) => {
+  UserRegister: async ( name,phone_number,email,message_category_id,governing_body,socket_id) => {
     try {
       await UseDatabase();
       const existUser=await getUserByEmailExist(email)
@@ -39,7 +39,7 @@ const UserService = {
       }else{
         const created_at = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
 
-        const result = await createUser(user_device, name,phone_number,email,message_category_id,governing_body,socket_id,type,created_at);
+        const result = await createUser(name,phone_number,email,message_category_id,governing_body,socket_id,created_at);
         console.log("not-exist-user---",result);
         return result;
       }

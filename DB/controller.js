@@ -156,10 +156,10 @@ const getAdminsByGoverning = async (governing) => {
   }
 };
 
-const getAdminsByGoverningAndOnline = async (governing) => {
+const getAdminsByGoverningAndOnline = async (governing_id) => {
   try {
-    const query = `SELECT * FROM users WHERE governing = ? AND online = true`;
-    const [results] = await pool.query(query, [governing]);
+    const query = `SELECT * FROM users WHERE governing = ? AND online = ?`;
+    const [results] = await pool.query(query, [governing_id,1]);
     return results;
   } catch (error) {
     console.error("Error fetching admins by governing and online status:", error);
@@ -205,9 +205,8 @@ const getUserByEmail = async (email) => {
 const createUserTable = async () => {
   try {
     const results = await pool.query(
-      `CREATE TABLE mobile_users_infos(
+      `CREATE TABLE mobile_user_infos(
           id INT AUTO_INCREMENT,
-          device_id varchar(255) NOT NULL,
           name varchar(255) NOT NULL,
           phone_number varchar(255) NOT NULL,
           email varchar(255) NOT NULL,
@@ -215,14 +214,12 @@ const createUserTable = async () => {
           activ BOOLEAN DEFAULT TRUE,
           governing_body_id BIGINT UNSIGNED NOT NULL,
           socket_id varchar(255) NOT NULL,
-          type varchar(255) NOT NULL,
           deleted_at TIMESTAMP NULL DEFAULT NULL,
           created_at TIMESTAMP NULL DEFAULT NULL,
           updated_at TIMESTAMP NULL DEFAULT NULL,
           PRIMARY KEY (id)
   );`
     );
-    //type = Android,IOS
     return results;
   } catch (error) {
     console.error(error);
@@ -236,13 +233,13 @@ const updateSocketIdUser = async (id, socket_id) => {
 
     // First, update the socket_id
     await pool.query(
-      `UPDATE mobile_users_infos SET socket_id = ?, updated_at = ? WHERE id = ?`,
+      `UPDATE mobile_user_infos SET socket_id = ?, updated_at = ? WHERE id = ?`,
       [socket_id,updated_at, id]
     );
 
     // Then, retrieve the updated data
     const [updatedUser] = await pool.query(
-      `SELECT * FROM mobile_users_infos WHERE id = ?`,
+      `SELECT * FROM mobile_user_infos WHERE id = ?`,
       [id]
     );
 
@@ -253,37 +250,33 @@ const updateSocketIdUser = async (id, socket_id) => {
 };
 
 const createUser = async (
-  device_id,
   name,
   phone_number,
   email,
   message_category_id,
   governing_body_id,
   socket_id,
-  type,
   created_at
 ) => {
   try {
     console.log(
-      device_id,
       name,
       phone_number,
       email,
       message_category_id,
       governing_body_id,
       socket_id,
-      type,
       created_at
     );
 
     const result = await pool.query(
-      `INSERT INTO mobile_users_infos(device_id, name,phone_number,email,message_category_id,governing_body_id,socket_id,type,created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [device_id, name,phone_number, email, message_category_id, governing_body_id,socket_id, type,created_at]
+      `INSERT INTO mobile_user_infos( name,phone_number,email,message_category_id,governing_body_id,socket_id,created_at) VALUES( ?, ?, ?, ?, ?, ?, ?)`,
+      [ name,phone_number, email, message_category_id, governing_body_id,socket_id,created_at]
     );
     const newUserId = result[0].insertId;
 
     // Retrieve the newly inserted room data, if needed
-    const [rows] = await pool.query(`SELECT * FROM mobile_users_infos WHERE id = ?`, [
+    const [rows] = await pool.query(`SELECT * FROM mobile_user_infos WHERE id = ?`, [
       newUserId,
     ]);
     console.log(rows[0],"rows[0]");
@@ -295,7 +288,7 @@ const createUser = async (
 };
 const getUser = async (userId) => {
   try {
-    let query = `SELECT * FROM mobile_users_infos`;
+    let query = `SELECT * FROM mobile_user_infos`;
     let params = [];
 
     if (userId) {
@@ -312,7 +305,7 @@ const getUser = async (userId) => {
 
 const getUserName=async(userId)=>{
   try {
-    let query = `SELECT * FROM mobile_users_infos`;
+    let query = `SELECT * FROM mobile_user_infos`;
     let params = [];
 
     if (userId) {
@@ -333,7 +326,7 @@ const getUserByNmaeAndId = async (id,name) => {
     
     const query = `
         SELECT * 
-        FROM mobile_users_infos 
+        FROM mobile_user_infos 
         WHERE id = ? 
           AND name = ?;`;
     const [rows] = await pool.query(query, [id,name]);
@@ -346,7 +339,7 @@ const getUserByNmaeAndId = async (id,name) => {
 
 const getUserByEmailExist = async (email) => {
   try {
-    let query = `SELECT * FROM mobile_users_infos`;
+    let query = `SELECT * FROM mobile_user_infos`;
     let params = [];
 
     if (email) {
@@ -365,11 +358,12 @@ const getUserByEmailExist = async (email) => {
 
 /////////////////// ROOM
 
-const createTableRoom = async (room_id, writer_id, content, type) => {
+const createTableRoom = async () => {
   try {
     const results = await pool.query(
       `CREATE TABLE rooms(
           id INT AUTO_INCREMENT,
+          m_user_id BIGINT UNSIGNED NOT NULL,
           mobile_user_id BIGINT UNSIGNED NOT NULL,
           mobile_user_name varchar(255) NOT NULL,
           operator_id BIGINT UNSIGNED NOT NULL,
@@ -403,13 +397,13 @@ const getRoomByOperatorIdChat=async(operatorId)=>{
   }
 }
 
-const getRoomByUserDeviceIdChat=async(mobile_user_id)=>{
+const getRoomByUserDeviceIdChat=async(m_user_id)=>{
   try {
     const query = `
         SELECT * 
         FROM rooms 
-        WHERE mobile_user_id = ?;`;
-    const [rows] = await pool.query(query, [mobile_user_id]);
+        WHERE m_user_id = ?;`;
+    const [rows] = await pool.query(query, [m_user_id]);
     return rows;
 } catch (error) {
     console.error('Error retrieving messages:', error);
@@ -447,6 +441,7 @@ const getRoomById = async (roomId) => {
 }
 
 const createRoom = async (
+  m_user_id,
   mobile_user_id,
   mobile_user_name,
   operator_id,
@@ -459,8 +454,9 @@ const createRoom = async (
 
     // Insert a new room
     const result = await pool.query(
-      `INSERT INTO rooms (mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body_id,email,created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO rooms (m_user_id,mobile_user_id, mobile_user_name, operator_id, message_category_id, governing_body_id,email,created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        m_user_id,
         mobile_user_id,
         mobile_user_name,
         operator_id,

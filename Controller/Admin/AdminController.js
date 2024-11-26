@@ -22,8 +22,8 @@ const AdminController = {
   },
   onlineExist: async (req, res) => {
     try {
-      const { governing } = req.body;
-      const result = await AdminService.onlineExist(governing);
+      const { governing_id } = req.body;
+      const result = await AdminService.onlineExist(governing_id);
       if (result[0]) {
         res.status(200).send({ message: "success" , operator: result[0]});
       } else {
@@ -100,7 +100,6 @@ const AdminController = {
           console.error(error);
           res.status(500).send("Error registering user");
         }
-        // const { email, id, type } = req.body;
       },
       login: async (req, res) => {
         try {

@@ -5,6 +5,7 @@ const http = require("http");
 const Route = require("./Router/Router");
 const moment = require("moment-timezone");
 const {getMessagesByRoomId,getAdminById,updateRoomStatus, getUser,UseDatabase,getRoomByOperatorId,getActivByGoverningOperator,createRoom ,findRoomExist, getRole, getModelHasRole, getGoverningBody} = require("./DB/controller");
+const { default: corsOptions } = require("./config/corsOptions.js");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -16,7 +17,7 @@ const io = new Server(server, {
   },
 });
 
-app.use(cors());
+app.use(cors());//corsOptions
 app.use(express.json());
 UseDatabase();
 
@@ -98,7 +99,7 @@ io.on("connection", (socket) => {
       io.to(operator[0].socket_id).emit("operatorNewJoin",{room:room, new:false})
       // io.to(operator.socket_id).emit("operatorOldRoomConnect",existRooms)
     }else{
-      const room=await createRoom(data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
+      const room=await createRoom(data.m_user_id,data.id,data.name,rooms[0].operator.id,data.message_category_id,data.governing_body_id,data.email)
       console.log("room-not-exist",room);
       currentRoom = room.id
       socket.join(room.id)
@@ -147,30 +148,23 @@ io.on("connection", (socket) => {
 
 
 app.use("/api", Route);
-const date = moment.tz(process.env.TZ).format("YYYY-MM-DD HH:mm:ss");
-console.log(date);
+// app.get("/operator", async(req, res) => {
+//   const {governing_body_id}=req.body
 
-app.get("/operator", async(req, res) => {
-  const {governing_body_id}=req.body
-
-  const governingBody=await getGoverningBody(governing_body_id)
-  console.log(governingBody);
+//   const governingBody=await getGoverningBody(governing_body_id)
+//   console.log(governingBody);
   
-  let activOperators=[]
-  for (let z = 0; z < governingBody.length; z++) {
-    const activOperator=await getActivByGoverningOperator(governingBody[z].user_id)
-    activOperators.push(activOperator[0])
-  }
+//   let activOperators=[]
+//   for (let z = 0; z < governingBody.length; z++) {
+//     const activOperator=await getActivByGoverningOperator(governingBody[z].user_id)
+//     activOperators.push(activOperator[0])
+//   }
 
-  res.send(activOperators);
-})
+//   res.send(activOperators);
+// })
 
-
+//socket search admin ic data.id tox uxarki vochte mobile_user_id ayl user_id vor@ laraveli uzerica galis
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
-
-// module.exports=pool
-
-
