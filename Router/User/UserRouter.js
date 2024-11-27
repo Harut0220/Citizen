@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const UserController = require("../../Controller/User/UserController");
-const { UserUpdateSocketId, UserAuth } = require("../../Middleware/user");
+const { UserUpdateSocketId, UserAuth } = require("../../Middleware/User");
 
 const UserRouter = Router();
 //UserAuth,

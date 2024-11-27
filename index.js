@@ -25,7 +25,7 @@ const io = new Server(server, {
   pingInterval: 25000,
   pingTimeout: 10000,
   cors: {
-    origin: ["https://citizenu.trigger.ltd", "https://citizenw.trigger.ltd"], // Ensure this matches your frontend
+    origin: ["http://localhost:3000", "http://192.168.122.1:8081"], // Ensure this matches your frontend
     methods: ["GET", "POST"],
   },
 });
