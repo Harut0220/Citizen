@@ -579,7 +579,8 @@ const createMessage = async (room_id, writer_id, content, writer,created_at) => 
     const [rows] = await pool.query(`SELECT * FROM messages WHERE id = ?`, [
       newMessageId,
     ]);
-
+    console.log("messageDbController------", rows[0]);
+    
     return rows[0];
   } catch (error) {
     console.error(error);

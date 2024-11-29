@@ -33,6 +33,7 @@ const MessageController = {
   send: async (req, res) => {
     try {
       const { room_id, writer_id, content, writer } = req.body;
+      console.log("Sending message keys",{room_id, writer_id, content, writer} );
       
       const result = await MessageService.send(
         room_id,
@@ -42,6 +43,8 @@ const MessageController = {
         
       );
       if (result) {
+        console.log("Message sent-------", result);
+        
         res.status(200).send(result);
       } else {
         res.status(403).send("Error");

@@ -25,7 +25,7 @@ const io = new Server(server, {
   pingInterval: 25000,
   pingTimeout: 10000,
   cors: {
-    origin: ["https://citizenw.trigger.ltd", "http://localhost:8081"], // Ensure this matches your frontend
+    origin: ["http://localhost:3000", "http://localhost:8081"], // Ensure this matches your frontend
     methods: ["GET", "POST"],
   },
 });
@@ -125,7 +125,9 @@ io.on("connection", (socket) => {
         room: room,
         new: false,
       });
-      io.to(data.id).emit("roomCreated", { room: data.id });
+      console.log("if------------",room.id);
+      
+      io.to(room.id).emit("roomCreated", { room, new: false });
       // io.to(operator.socket_id).emit("operatorOldRoomConnect",existRooms)
     } else {
       const room = await createRoom(
@@ -145,12 +147,16 @@ io.on("connection", (socket) => {
       console.log("operator_socket------", rooms[0].operator.socket_id);
       console.log("user_socket-------", data.socket_id);
       room.messages = [];
+      console.log("else------------",room.id);
+
       // socket.to(room.id).emit("roomCreated",{room:room.id})
       socket
         .to(rooms[0].operator.socket_id)
         .emit("operatorNewJoin", { room, new: true });
+
+        io.to(room.id).emit("roomCreated", { room, new: true });
     }
-    io.to(data.id).emit("roomCreated", { room: data.id });
+    
   });
 
   socket.on("create_message", (data) => {
