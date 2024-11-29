@@ -1,10 +1,20 @@
 // const { updateRoomStatus,createRoom } = require("../../DB/controller");
 
-const { UseDatabase,createMessage, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId, getRoomByUserDeviceIdChat } = require("../../DB/controller");
+const { UseDatabase,createMessage, updateRoomStatus, createRoom, getUserName, getAdminById, getUser, getUserByNmaeAndId, getRoomByOperatorIdChat, getMessagesByRoomId, getRoomByUserDeviceIdChat, getRoomForUser } = require("../../DB/controller");
 const moment = require('moment-timezone');
 
 
 const RoomService = {
+    getRoomForUser: async (m_user_id,mobile_user_id,message_category_id,governing_body_id,email) => {
+        try {
+            await UseDatabase();
+            const rooms = await getRoomForUser(m_user_id,mobile_user_id,message_category_id,governing_body_id,email);
+            return rooms
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
     getRoomByUser: async (user_id) => {
         try {
             await UseDatabase();

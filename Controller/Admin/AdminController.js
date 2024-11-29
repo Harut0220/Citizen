@@ -27,7 +27,7 @@ const AdminController = {
       if (result[0]) {
         res.status(200).send({ message: "success" , operator: result[0]});
       } else {
-        res.status(403).send({ message: "error" ,operator:[]});
+        res.status(200).send({ message: "error" ,operator:[]});
       }
     } catch (error) {
       console.error(error);

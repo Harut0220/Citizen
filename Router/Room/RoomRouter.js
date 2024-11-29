@@ -16,4 +16,6 @@ RoomRouter.get("/get/rooms/operator/:id",RoomController.getRoom)
 //getRoom,
 RoomRouter.get("/get/rooms/user/:id",RoomController.getRoomByUser)
 
+RoomRouter.post("/get/for/user",RoomController.getRoomForUser)
+
 module.exports = RoomRouter

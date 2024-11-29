@@ -500,6 +500,24 @@ const findRoomExist = async(mobile_user_id, mobile_user_name,operator_id,message
 }
 }
 
+const getRoomForUser = async(m_user_id,mobile_user_id,message_category_id,governing_body_id,email)=> {
+  try {
+    const query = `
+        SELECT * 
+        FROM rooms 
+        WHERE m_user_id = ? 
+          AND mobile_user_id = ?
+          AND message_category_id = ?
+          AND governing_body_id = ?
+          AND email = ?;`;
+    const [rows] = await pool.query(query, [m_user_id,mobile_user_id,message_category_id,governing_body_id,email]);
+    return rows;
+} catch (error) {
+    console.error('Error retrieving messages:', error);
+    throw error;
+}
+}
+
 
 const updateRoomStatus = async (roomId, newStatus) => {
   try {
@@ -699,5 +717,6 @@ module.exports = {
   getAdminsByGoverningAndOnline,
   getUserByEmailExist,
   getRoomByUserDeviceIdChat,
-  getRoomById
+  getRoomById,
+  getRoomForUser
 };

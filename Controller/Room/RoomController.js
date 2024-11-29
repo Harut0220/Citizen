@@ -3,6 +3,20 @@ const RoomService = require("../../Service/Room/RoomService");
 
 
 const RoomController = {
+    getRoomForUser: async (req, res) => {
+        try {
+            const {m_user_id,mobile_user_id,message_category_id,governing_body_id,email} = req.body;
+            const result = await RoomService.getRoomForUser(m_user_id,mobile_user_id,message_category_id,governing_body_id,email);
+            if (result) {
+                res.status(200).send(result);
+            } else {
+                res.status(403).send("Error");
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error");
+        }
+    },
     getRoomByUser: async (req, res) => {
         try {
             const { id } = req.params;
